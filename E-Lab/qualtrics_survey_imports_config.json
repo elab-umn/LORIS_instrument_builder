@@ -1,0 +1,220 @@
+{
+  "phenoscreening-pheSurvey1": {
+    "qualtrics_config": "phenoscreening",
+    "demographics": {
+      "id": "SV_6AwXNB15ZfIDNAy",
+      "json": "CONFIG_101_20210726_pheno_demo.json",
+      "table": "demographics_eligibility",
+      "note": "Survey [SV_ctKeUShUufk4DGZ,**OLD DO NOT USE** Demographics-pheno] exists, but is old and was not used"
+    },
+    "vrRSB": {
+      "id": "SV_8CVQSL8JsyIhRit",
+      "json": "CONFIG_102_20210726_pheno_vrrsb.json",
+      "table": "vrRSB"
+    },
+    "RBS-ECS": {
+      "id": "SV_3NMG9fI1XKQT6zH",
+      "json": "CONFIG_103_20210726_pheno_rbsecs.json",
+      "table": "rbs_ecs"
+    },
+    "MCDI-WG": {
+      "id": "SV_exKrNWFUmgcwjpH",
+      "json": "CONFIG_104_20210726_pheno_mcdi_wg.json",
+      "table": "mcdi"
+    },
+    "MCHAT": {
+      "id": "SV_9oX3EPDrZXcj6BL",
+      "json": "CONFIG_105_20210726_pheno_mchat.json",
+      "table": "mchat_RF"
+    },
+    "APSI": {
+      "id": "SV_6DX8771xevJiWHj",
+      "json": "CONFIG_106_20210726_pheno_apsi.json",
+      "table": "apsi"
+    },
+    "Final-Concern": {
+      "id": "SV_bqkk3KEX7vW23fD",
+      "json": "CONFIG_107_20210726_pheno_concern.json",
+      "table": "pheno2_concern"
+    }
+  },
+  "phenoscreening-pheSurvey2": {
+    "qualtrics_config": "phenoscreening",
+    "vrRSB": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "RBS-ECS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "MCDI-WG": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "MCHAT": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "APSI": {
+      "id": "",
+      "json": "",
+      "table": ""
+    }
+  },
+  "phenoscreening-pheBehav1": {
+    "qualtrics_config": "phenoscreening",
+    "vrRSB": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "RBS-ECS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "MCDI-WS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "MCDI-WG": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "APSI": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "CBCL": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "BISQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SDQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "STAI": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "BDI-II": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "Major Life Events": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SMQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "CSUS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "ECBQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "ITSEA": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "Edinburgh Handedness Inventory": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "ACE Family": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "ACE Subject": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SCQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SRS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    }
+  },
+  "phenoscreening-pheBehav2": {
+    "qualtrics_config": "phenoscreening",
+    "SCQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SRS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "RBS-ECS": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "CBCL": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SDQ": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "BDI-II": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SRS Adult Self Report": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "SRS Adult Informant Report": {
+      "id": "",
+      "json": "",
+      "table": ""
+    },
+    "STAI": {
+      "id": "",
+      "json": "",
+      "table": ""
+    }
+  }
+}

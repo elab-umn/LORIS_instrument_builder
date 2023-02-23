@@ -1,0 +1,17 @@
+[redcap]
+host = path.to.loris.umn.edu
+database = icd
+username = redcap_ro
+password = very$ecurepassword
+
+[prod]
+host = path.to.loris.umn.edu
+database = icd
+username = admin_user
+password = veryVery$ecurepassword
+
+[dev]
+host = path.to.dev.umn.edu
+database = devicd
+username = devuser
+password = pa$$word
