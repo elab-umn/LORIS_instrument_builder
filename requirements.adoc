@@ -1,0 +1,18 @@
+= Requirements
+
+Python version 3.8 or higher
+
+[horizontal]
+.Python Libraries
+argparser:: standardizes arguments and allows scripts to be run from the command line
+config:: DCAN scripts use this (`config` and `token`)
+configparser:: library that parses config files, to keep connection information secure
+datetime:: standardized library for formatting dates and times in python
+functools:: add details here 
+json:: parses json strings for APIs and instrument templates
+jinja2:: build php files programatically from python data
+mysql.connector:: connects python scripts to mysql database
+pandas:: dataframe manipulation
+requests:: send HTTP/1.1 requests and easily manage response data
+re:: regex library for matching and replacing strings
+traceback:: error handling for codes

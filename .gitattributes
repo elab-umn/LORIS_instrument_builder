@@ -1,0 +1,5 @@
+# RESOLVED GIT LINE ENDING ISSUES across operating systems
+# see link for more details: https://code.visualstudio.com/docs/remote/troubleshooting#_resolving-git-line-ending-issues-in-containers-resulting-in-many-modified-files
+* text=auto eol=lf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf
