@@ -1,0 +1,14 @@
+;list all qualtrics acccounts here
+;each account must include an api-token, data-center, and content-type (which will typically always be application/json)
+;api-token and data-center can be found by navigating to "Account Settings > Qualtrics IDs" after logging in to your qualtrics account
+;below, we show two examples. 
+
+[qualtricsproject1accountname]
+api-token = NZE84BRO82Z9REEGOF2IBARYAF8IF4KHB7OUVQFO
+data-center = dc1
+content-type = application/json
+
+[qualtricsproject2accountname]
+api-token = T8ML73QR8QHUOHSJCXO3ZF2EC4HALYS5SHCIJTJR
+data-center = site
+content-type = application/json

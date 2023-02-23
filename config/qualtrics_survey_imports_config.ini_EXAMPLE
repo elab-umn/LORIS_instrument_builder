@@ -1,0 +1,42 @@
+;each data import group should be created under a header
+;at a minimum there should be three entries for a given `instrument` 
+;these should follow the form: id_instrument, json_instrument, and table_instrument
+
+[project1-simple-example]
+;qualtrics survey ids
+id_consent = SV_L59A8MSOOOK80JP
+;json files linking LORIS table columns to qualtrics fields
+json_consent = CONFIG_project1_consent.json
+;corresponding LORIS table names, here project1_consent
+table_consent = project1_consent
+
+;some projects may have different timepoints or data sources, which can be configured under a separate header
+[project1-surveys]
+#qualtrics survey ids
+id_demographics = SV_e5x8qnafzksqegq
+id_vrrsb = SV_r82uvo2k81bddra
+id_mchat = SV_yws88pmrkkaoch3
+id_apsi = SV_w44p2zth3iwl8t0
+id_mcdi-wg = SV_n0asr7aht3weoos
+#json files linking LORIS tables to qualtrics fields
+json_demographics = CONFIG_101_demo.json
+json_vrrsb = CONFIG_102_vrrsb.json
+json_mchat = CONFIG_105_mchat.json
+json_apsi = CONFIG_106_apsi.json
+json_mcdi-wg = CONFIG_104_mcdi_wg.json
+#corresponding LORIS tables
+table_demographics = demographics_eligibility
+table_vrrsb = vrRSB
+table_mchat = mchat_RF
+table_apsi = apsi
+table_mcdi-wg = mcdi
+
+;definitions do not have to be in a specific order
+[project2-surveys]
+id_rbs-esc = SV_4no8isxxwmkz0tv
+json_rbs-esc = CONFIG_103_rbsecs.json
+table_rbs-esc = rbs_ecs
+table_mcdi-wg = mcdi
+id_mcdi-wg = SV_1txc2i7i5uz1w5j
+json_mcdi-wg = CONFIG_104_mcdi_wg.json
+#NOTE: CONFIG files should be reused between projects if using the same survey layout
