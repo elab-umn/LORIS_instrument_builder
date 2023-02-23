@@ -1,3 +1,14 @@
+# # Ignore these file extensions 
+
+# vscode workspace files
+*.code-workspace 
+# back up files
+*.bak
+# password files
+*.ini
+
+
+### Python related files
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
