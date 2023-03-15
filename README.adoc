@@ -1,3 +1,26 @@
-= LORIS_instrument_builder
+= LORIS Instrument Builder
 
 Python scripts to configure and build instruments in LORIS
+
+This repository has a number of scripts and classes that are useful to automatically building instruments for LORIS. In general, it is essential to know which data will be stored in the SQL, which data will be displayed in the PHP instrument, and the mapping between the datatypes in SQL and PHP. 
+
+.Steps to build an instrument with the LORIS_instrument_builder
+. Build a `.json` file outlining the fields in the SQL table. The `.json` file also links these SQL fields with how the data will appear in PHP. 
+.. There are a few automated processes pulling data from Redcap and Qualtrics surveys. These are designed to quickly build instruments from existing data collection.  
+. Using the `generate_instrument_from_template` function, process the `<instrument_name>_instrument_details.json` files to 
+** (1) generate SQL scripts to build instrument tables and 
+** (2) generate PHP instrument files to add to `<loris_instance>/project/instruments/` directory. 
+. Optionally, you can connect these scripts directly to your instance of LORIS through the MySQL APIs using `mysql.connector`. Doing so, the scripts generated from 
+
+
+== Formatting the <instrument_name>_instrument_details.json file
+
+This is a basic json file that contains all of the information to generate an instrument in LORIS. 
+
+There are 6 main keys that are required: 
+
+[horizontal]
+instrument_name_loris:: The name of the SQL table. Best practice dictates that tables should follow the https://github.com/aces/Loris/blob/main/docs/SQLModelingStandard.md[LORIS conventions] for naming SQL tables in snake_case, which means they should be all lowercase with words separated by underscores (i.e. instrument_name, _not_ InstrumentName). 
+metadata_fields::
+validity_enabled::
+validity_required::

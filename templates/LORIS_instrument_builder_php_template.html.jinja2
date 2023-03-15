@@ -1,0 +1,233 @@
+<?php
+
+/**
+ * This file contains the NDB_BVL_Instrument_{{ instrument.sql_table_name }}
+ * class
+ *
+ * @category Instrument
+ * @package  LORIS Instrument Builder
+ * @author   {{ instrument.author }} 
+ * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
+ * @link     https://www.github.com/aces/loris/ 
+ * @updated  {{ instrument.date }} 
+ */
+
+class NDB_BVL_Instrument_{{ instrument.sql_table_name }} extends NDB_BVL_Instrument
+{
+    // use \LorisFormDictionaryImpl;
+    use LegacyInstrumentTrait;
+    var $ValidityEnabled = {{ instrument.validity_enabled }};
+    var $ValidityRequired = {{ instrument.validity_required }};
+
+    {% if groups["ngroups"] > 0 %} 
+        {% for grp in range(1, groups.ngroups + 1) %}
+            {% if groups["group_" ~ grp] is defined %}
+    var ${{ groups["group_" ~ grp]["group_name"] }} = array({% for grpQ in groups["group_" ~ grp]["group_fields_keys"] %} 
+        '{{ grpQ["field"] }}' => array(
+            "label" => "{{ grpQ["label"]|e }}", 
+            "type" => "{{ grpQ["type"] }}", 
+            "options" => {{ grpQ["options"] if grpQ["options"] else "null"}} ) {{ "," if not loop.last }} {% endfor %}
+    ); 
+            {% endif %}
+        {% endfor %}
+    {% else %}
+    /* GROUP IF IS FAILING for some reason... groups["ngroups"] = {{groups["ngroups"]}}*/
+    {% endif %}
+
+    // Standard function to add question group to form. These appear as an indented group of questions. 
+    // QUESTION GROUP HEADER (optional):
+    //      Question 1 label [field]
+    //      Question 2 label [field]
+    //      Question 3 label [field]
+    //      Question 4 label [field]
+    function addQuestionGroup(&$form, $questions, $header=NULL, $prepend_field=null, $field_append=null) {
+        if (!is_null($header)) {
+            $form->addElement("static", null, "<b>" . $header . "</b>");
+        }
+        foreach ($questions as $field => $question_data) {
+            // if $question_data is an array, we assume it has the structure loris_field => question_data
+            // where question_data is an array of multiple properties with possible keys (type, label, options, attributes, customs)
+            // this is the only format that supports different types of input types. 
+            if (is_array($question_data)) {
+                $form->addElement(
+                    array_key_exists("type", $question_data) ? $question_data['type'] : "static", 
+                    (!is_null($prepend_field) ? $prepend_field : "") . $field . (!is_null($field_append) ? $field_append : ""), 
+                    array_key_exists("label", $question_data) ? $this->indent . $this->indent . $question_data["label"] : $this->indent . $this->indent . $field , 
+                    array_key_exists("options", $question_data) ? $question_data['options'] : null, 
+                    array_key_exists("attributes", $question_data) ? $question_data['attributes'] : null, 
+                    array_key_exists("customs", $question_data) ? $question_data['customs'] : null
+                ); 
+            } else {
+                // otherwise it should be just a string, we assume it is the string label (or default to the field_label)
+                $form->addElement(
+                    'static', 
+                    (!is_null($prepend_field) ? $prepend_field : "") . (is_string($field) ? $field : $question_data) . (!is_null($field_append) ? $field_append : "") . "", 
+                    $this->indent . $this->indent . (is_string($question_data) ? $question_data : $field) );   
+            }
+        }
+    }
+
+    /**
+     * sets up basic data, such as the HTML_Quickform object, and so on.
+     *
+     * @param string $commentID the CommentID identifying the data to load
+     * @param string $page if a multipage form, the page to show
+     * @return void
+     * @access public
+     */
+    function setup(?string $commentID = null, $page = null): void
+    {
+        $this->formType = "XIN";
+        $this->form = new LorisForm('test_form');
+
+        $this->page = $page;            
+        /* page label (number or string - used by user-defined child classes) */
+
+        // set the object properties
+        $this->testName = '{{ instrument.sql_table_name }}' ;           // test_names.Test_name
+        $this->table = '{{ instrument.sql_table_name }}';              // name of database table corresponding to instrument
+        // FULL NAME: {{ instrument.instrument_name }}
+        // data keyed by commentID
+        $this->commentID = $commentID;
+
+        //The array of dates/timestamps to convert to database dates/timestamps
+        //Any HTML_Quickform date elements must be listed here
+        $this->dateTimeFields = array(
+{% if instrument.metadata_fields %}              "Date_taken" {% for datevar in fields.date_fields %}, "{{ datevar }}"{% endfor %}
+{% else %}
+                {% for datevar in fields.date_fields %}"{{ datevar }}"{{ "," if not loop.last }}{% endfor %}
+{% endif %}
+
+        );
+
+        //The array of selects with multiple answers allowed
+        //Any HTML_Quickform multiple selects must be listed here
+        $this->_selectMultipleElements = array();
+
+        // Get the subject age in months for scoring
+
+        $db =& Database::singleton();
+        // required fields for data entry completion status
+{# TODO: update this based on first and last question of each page #}
+        $this->_requiredElements = array(
+            
+        );
+
+        //MODIFY THIS WHEN THE SCORING IS IMPLEMENTED
+        // $this->_doubleDataEntryDiffIgnoreColumns = array('CommentID', 'UserID', 'Testdate', 'Window_Difference', 'Candidate_Age', 'Data_entry_completion_status'
+        // );
+
+        // setup the form
+        $this->_setupForm();
+
+    }
+
+    /**
+     * method to build the HTML_Quickform object into a paged form
+     *
+     * @return void
+     * @access private
+     */
+    function _setupForm()
+    {
+        if (preg_match("/(_page[0-9]+)/", $this->page, $matches)) {
+            call_user_func(array($this, $matches[1]));
+        } else {
+            $this->_main();
+        }
+
+        //Defines the call back function for HTML Quickform to use when validating the form.
+        $this->form->addFormRule(array(&$this, 'XINValidate'));
+    }
+
+    /**
+     * generates the main page of the form.
+     *
+     * @return void
+     * @access private
+     *
+     */
+{#{% for pg in pages %} 
+    {% if pages["page" ~ pg].page_name == "main" %}#}
+{% set ns = namespace(groupsadded = "|")%}
+{% for pg in range(0, pages.npages + 1) %}
+    {% if pg == 0 %}
+    function _main()
+    {
+        // display test name
+        $this->addHeader("{{ instrument.instrument_name }}");
+
+        {% if instrument.metadata_fields %} 
+        // automatically adds examiner & date of administration
+        $this->_addMetadataFields();
+
+        {%  endif %}
+    {% else %}
+    function _{{ pages["page" ~ pg].page_name }}()
+    {
+    {% endif %}
+        $this->addHeader("{{ pages["page" ~ pg].title|e }}");
+{% if pages["page" ~ pg].note_php %}            /* PAGE NOTES: {{pages["page" ~ pg].note_php|e}} */
+
+{% endif %}
+    {# ADD FIELD DATA #}
+    {% for q in fields.keys() %}
+    {% if fields[q]["page_php"] == pg and not fields[q]["hidden_on_php"] %}
+        {% if fields[q]["group_php"] != false %}
+            {% if fields[q]["group_php"] not in ns.groupsadded %}
+        {# /// Adding group for {{fields[q]["group_php"]}} ---------------- #}
+                {% for grp in groups.keys() %}
+                    {% if groups[grp]["group_name"] == fields[q]["group_php"]%}
+                    {# // found the correct group {{groups[grp]["group_name"]}} #}
+                        {% if groups[grp]["type"] == "question" %}
+        $this->addQuestionGroup($this->form, $this->{{fields[q]["group_php"]}}, {% if groups[grp]["group_front_text_php"] != false %}{{'"' ~ groups[grp]["group_front_text_php"]|e ~ '"'}}{%else%}null{%endif%}, null, null);
+                        {% elif groups[grp]["type"] == "table" %}
+        // $this->addTableGroup($this->form,$this->{{fields[q]["group_php"]}} ); 
+        // FIXME: need to update scripts. 
+                        {% else %}
+        /// SOMETHINGS WRONG {{fields[q]["group_php"]}} wasn't added!!!!!!!!!!!!
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% set ns.groupsadded = ns.groupsadded ~ "|" ~ fields[q]["group_php"] %}
+            {% endif %}
+        {% elif fields[q]["field_type_loris"] in field_type.text%}
+            {% if fields[q]["associated_status_field"] %}
+        $this->addTextElement('{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+            {% else %}
+        $this->form->addElement('text','{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+            {% endif %}
+        {% elif fields[q]["field_type_loris"] in field_type.textarea %}
+        $this->addTextAreaElement('{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+        {% elif fields[q]["field_type_loris"] == 'enum' %}
+        $this->form->addElement('select', '{{ fields[q]["field_name_loris"] }}', "{{ fields[q]["field_front_text_php"]|e }}", {{ fields[q]["enum_array"] }} );
+        {% elif fields[q]["field_type_loris"] == 'date' %}
+        $this->addBasicDate('{{ fields[q]["field_name_loris"] }}', "{{ fields[q]["field_front_text_php"]|e }}");
+        {% elif fields[q]["field_type_loris"] == 'header' %}
+        $this->addHeader("{{ fields[q]["field_front_text_php"] }}");
+        {% elif fields[q]["field_type_loris"] == 'static' %}
+        $this->form->addElement('static','',"{{ fields[q]["field_front_text_php"]|e }}");
+        {% elif fields[q]["field_type_loris"] == 'br' or fields[q]["field_type_loris"] == 'break' %}
+        $this->form->addElement('static','',"<br/>");
+        {% elif fields[q]["field_type_loris"] == 'score' %}
+        $this->form->addElement('static','{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+        {% endif %}
+        {% if (fields[q]["rules_php"] is defined) and (fields[q]["rules_php"] != false) %}
+        $this->form->XINRegisterRule( 
+            {{ fields[q]["field_type_loris"] }}, 
+            array( {% if fields[q]["XINResgisterRule"]["rule"] is defined %} {{ fields[q]["XINResgisterRule"]["rule"] }} {% else %} {{ fields[q]["field_type_loris"] ~ "{@}={@}NEVER_REQUIRED"}} {% endif %}  ), 
+            {% if fields[q]["XINResgisterRule"]["message"] is defined %} {{ fields[q]["XINResgisterRule"]["message"] }} {% elif fields[q]["XINResgisterRule"]["required"] == true %} "Required" {% else %} "Not required..."  {% endif %} 
+            {% if fields[q]["XINResgisterRule"]["rule"] is defined %} {{ ", " ~ fields[q]["XINResgisterRule"]["group"] }} {% else %} "" {% endif %} )
+        {% endif %}
+        {# ADD any php notes to be included for question field #}
+        {% if fields[q]["note_php"]%}            /* NOTE: {{ fields[q]["field_name_loris"] }} {{ fields[q]["note_php"] }} */
+        {% endif %}
+    {% endif %}
+    {% endfor %}
+    }
+
+
+{% endfor %}
+}
+
+?>
