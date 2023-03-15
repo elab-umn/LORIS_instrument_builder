@@ -1,17 +1,19 @@
 {
     "instrument_name": "Toddler Autism Diagnostic Interview-Revised (ADI-R)",
     "instrument_name_loris": "adi_r_toddler",
+    "metadata_fields": true, 
+    "validity_enabled": false, 
+    "validity_required": false,
     "pages": {
-        "page0": {"order": 0, "title": "Top Page", "metadata_fields": true, "validity_enabled": false, "validity_required": false},
-        "page1": {"order": 1, "title": "Early Development", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 1 to 13"},
-        "page2": {"order": 2, "title": "Acquisition and Loss of Language/Other Skills", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 14 to 33"},
-        "page3": {"order": 3, "title": "Loss of Language Skills", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 34 to 49"},
-        "page4": {"order": 4, "title": "General Loss of Skills", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 50 to 60"},
-        "page5": {"order": 5, "title": "Language and Communication Functioning", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 61 to 69"},
-        "page6": {"order": 6, "title": "Social Development and Play", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 70 to 95"},
-        "page7": {"order": 7, "title": "Interests and Behaviors", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 96 to 110"},
-        "page8": {"order": 8, "title": "General Behaviors", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 111 to 125"},
-        "page9": {"order": 9, "title": "Special Isolated Skills", "metadata_fields": true, "validity_enabled": false, "validity_required": false, "notes": "Questions 126 to 135"}
+        "page1": {"order": 1, "title": "Early Development", "note_php": "Questions 1 to 13"},
+        "page2": {"order": 2, "title": "Acquisition and Loss of Language/Other Skills", "note_php": "Questions 14 to 33"},
+        "page3": {"order": 3, "title": "Loss of Language Skills","note_php": "Questions 34 to 49"},
+        "page4": {"order": 4, "title": "General Loss of Skills", "note_php": "Questions 50 to 60"},
+        "page5": {"order": 5, "title": "Language and Communication Functioning", "note_php": "Questions 61 to 69"},
+        "page6": {"order": 6, "title": "Social Development and Play", "note_php": "Questions 70 to 95"},
+        "page7": {"order": 7, "title": "Interests and Behaviors", "note_php": "Questions 96 to 110"},
+        "page8": {"order": 8, "title": "General Behaviors", "note_php": "Questions 111 to 125"},
+        "page9": {"order": 9, "title": "Special Isolated Skills", "note_php": "Questions 126 to 135"}
     },
     "fields": {
         "field1": {
@@ -31,7 +33,7 @@
           },
           "field2": {
             "field_name_loris": "social_affect_total",
-            "field_front_text_php": "",
+            "field_front_text_php": "Social Affect Total",
             "field_type_loris": "tinyint",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -46,7 +48,7 @@
           },
           "field3": {
             "field_name_loris": "restricted_repetitive_behavior_total",
-            "field_front_text_php": "",
+            "field_front_text_php": "Restricted and Repeitive Behavior Total",
             "field_type_loris": "tinyint",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -61,7 +63,7 @@
           },
           "field4": {
             "field_name_loris": "reciprocal_and_peer_interaction_total",
-            "field_front_text_php": "",
+            "field_front_text_php": "Reciprocal and peer interaction total",
             "field_type_loris": "tinyint",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -76,7 +78,7 @@
           },
           "field5": {
             "field_name_loris": "total_score",
-            "field_front_text_php": "",
+            "field_front_text_php": "TOTAL SCORE",
             "field_type_loris": "tinyint",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -91,7 +93,7 @@
           },
           "field6": {
             "field_name_loris": "classification_using_research_cutoff",
-            "field_front_text_php": "",
+            "field_front_text_php": "Classification using RESEARCH CUTOFF",
             "field_type_loris": "tinyint",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -106,7 +108,7 @@
           },
           "field7": {
             "field_name_loris": "classification_using_clinical_cutoff",
-            "field_front_text_php": "",
+            "field_front_text_php": "Classification using CLINICAL CUTOFF",
             "field_type_loris": "tinyint",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -121,7 +123,7 @@
           },
           "field8": {
             "field_name_loris": "ranges_of_concern",
-            "field_front_text_php": "",
+            "field_front_text_php": "Ranges of concern",
             "field_type_loris": "text",
             "enum_values_loris": [],
             "enum_values_php": [],
@@ -167,14 +169,16 @@
           "field11": {
             "field_name_loris": "q_2_age_first_noticed",
             "field_front_text_php": "2. Age (in months) when parents first noticed that something was amiss",
-            "fild_type_loris": "int", 
-            "field_include_not_answered": true,
+            "field_type_loris": "int", 
+            "field_include_not_answered": false,
             "field_default_value": false,
             "associated_status_field": false,
             "page_php": 1,
             "hidden_on_php": false,
             "group_php": false,
-            "rule_php": false,
+            "rule_php": {
+              "required": false
+            },
             "note_php": "Code age in months, or choose one of the below codes. Try to code an actual age rather than 996, etc. Note: If parents express age in weeks, code ta nearest month. if an age range is given (e.g., 3-4 months), take the midpoint and round up to nearest month. As far as possible, try to code an actual age rather than 996, etc.\n991= parents not concerned, although child was referred by professional\n992= parents have been worried since birth (e.g., if baby premature or very ill at birth)\n996= can't recall, but before 12 months\n997= can't recall, but 12 months or later\n998= N/A\n999= N/K or not asked"
           },
           "field12": {
@@ -189,7 +193,7 @@
               "lack of interest in or abnormality/oddity in social or emotional response to peaple (may include specific difficulties in playing with other children or 'in world of his/her own' or general social incompetence)",
               "behavior difficulty not specific to autism (e.g. sleeping or eating problems, generally high activity level, wandering, aggressive or destructive behavior)",
               "autistic-type behaviors (e.g. hand or finger mannerisms; unusual attachments; extreme difficulties with change; highly repetitious, nonfunctional behaviors; unusual or no appropriate play with objects)",
-              "possible tack of ability fo live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
+              "possible tack of ability to live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
               "concerns not directly associated with child's behavior or development (e.g. family problems or dispute over care or schooling or financial compensation)",
               "professionals worried; parents not",
               "N/K or not asked"
@@ -199,7 +203,7 @@
             "associated_status_field": false,
             "page_php": 1,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_3",
             "rule_php": false,
             "note_php": false
           },
@@ -215,7 +219,7 @@
               "lack of interest in or abnormality/oddity in social or emotional response to peaple (may include specific difficulties in playing with other children or 'in world of his/her own' or general social incompetence)",
               "behavior difficulty not specific to autism (e.g. sleeping or eating problems, generally high activity level, wandering, aggressive or destructive behavior)",
               "autistic-type behaviors (e.g. hand or finger mannerisms; unusual attachments; extreme difficulties with change; highly repetitious, nonfunctional behaviors; unusual or no appropriate play with objects)",
-              "possible tack of ability fo live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
+              "possible tack of ability to live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
               "concerns not directly associated with child's behavior or development (e.g. family problems or dispute over care or schooling or financial compensation)",
               "professionals worried; parents not",
               "N/K or not asked"
@@ -225,7 +229,7 @@
             "associated_status_field": false,
             "page_php": 1,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_3",
             "rule_php": false,
             "note_php": false
           },
@@ -241,7 +245,7 @@
               "lack of interest in or abnormality/oddity in social or emotional response to peaple (may include specific difficulties in playing with other children or 'in world of his/her own' or general social incompetence)",
               "behavior difficulty not specific to autism (e.g. sleeping or eating problems, generally high activity level, wandering, aggressive or destructive behavior)",
               "autistic-type behaviors (e.g. hand or finger mannerisms; unusual attachments; extreme difficulties with change; highly repetitious, nonfunctional behaviors; unusual or no appropriate play with objects)",
-              "possible tack of ability fo live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
+              "possible tack of ability to live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
               "concerns not directly associated with child's behavior or development (e.g. family problems or dispute over care or schooling or financial compensation)",
               "professionals worried; parents not",
               "N/K or not asked"
@@ -251,7 +255,7 @@
             "associated_status_field": false,
             "page_php": 1,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_3",
             "rule_php": false,
             "note_php": false
           },
@@ -267,7 +271,7 @@
               "lack of interest in or abnormality/oddity in social or emotional response to peaple (may include specific difficulties in playing with other children or 'in world of his/her own' or general social incompetence)",
               "behavior difficulty not specific to autism (e.g. sleeping or eating problems, generally high activity level, wandering, aggressive or destructive behavior)",
               "autistic-type behaviors (e.g. hand or finger mannerisms; unusual attachments; extreme difficulties with change; highly repetitious, nonfunctional behaviors; unusual or no appropriate play with objects)",
-              "possible tack of ability fo live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
+              "possible tack of ability to live independently or happily (include difficulties finding a job, looking after him/herself etc.)",
               "concerns not directly associated with child's behavior or development (e.g. family problems or dispute over care or schooling or financial compensation)",
               "professionals worried; parents not",
               "N/K or not asked"
@@ -277,7 +281,7 @@
             "associated_status_field": false,
             "page_php": 1,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_3",
             "rule_php": false,
             "note_php": false
           },
@@ -328,7 +332,7 @@
           },
           "field19": {
             "field_name_loris": "q_7_age_first_noticed_social_communication_difficulties",
-            "field_front_text_php": "7. Age (in monihs) when parents first noticed social or communication difficulties",
+            "field_front_text_php": "7. Age (in months) when parents first noticed social or communication difficulties",
             "field_type_loris": "int", 
             "field_include_not_answered": true,
             "field_default_value": false,
@@ -528,7 +532,7 @@
             "associated_status_field": false,
             "page_php": 2,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_17",
             "rule_php": false,
             "note_php": false
           },
@@ -550,7 +554,7 @@
             "associated_status_field": false,
             "page_php": 2,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_17",
             "rule_php": false,
             "note_php": false
           },
@@ -613,7 +617,7 @@
             "associated_status_field": false,
             "page_php": 2,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_20",
             "rule_php": false,
             "note_php": false
           },
@@ -634,7 +638,7 @@
             "associated_status_field": false,
             "page_php": 2,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_20",
             "rule_php": false,
             "note_php": false
           },
@@ -649,7 +653,7 @@
             "associated_status_field": false,
             "page_php": 2,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_20",
             "rule_php": false,
             "note_php": false
           },
@@ -852,7 +856,7 @@
             "enum_values_loris": ["0", "1", "2", "3", "8", "9"],
             "enum_values_php": [
               "no verbal rituals",
-              "tendency to say things in ritualized way or to require others fo do so, but no indication that this is compulsive, and readily stops if asked to do so",
+              "tendency to say things in ritualized way or to require others to do so, but no indication that this is compulsive, and readily stops if asked to do so",
               "child has to say one or more things in a special way; rituals may intrude on faniily life, may iN/Alve other family members and some distress at interruption, ov may cause some disturbance or minor reorganization of family life that can be tolerated by most fantilies",
               "as for '2,' but with marked difficulty to control and marked intrusiveness on family life; family members involved to a degree that causes definite social impairment, disruption, or prevention of some family activities, serious distress at any attempted interruption",
               "N/A (code '1' or '2' on Ttem 23)",
@@ -1387,7 +1391,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1406,7 +1410,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1425,7 +1429,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1444,7 +1448,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1463,7 +1467,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1482,7 +1486,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1501,7 +1505,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1520,7 +1524,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1539,7 +1543,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1558,7 +1562,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1577,7 +1581,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1596,7 +1600,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1615,7 +1619,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1634,7 +1638,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1653,7 +1657,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1672,7 +1676,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1691,7 +1695,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1710,7 +1714,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1729,7 +1733,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1748,7 +1752,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1767,7 +1771,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1786,7 +1790,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1805,7 +1809,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1824,7 +1828,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1843,7 +1847,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1862,7 +1866,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1881,7 +1885,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -1900,7 +1904,7 @@
             "associated_status_field": false,
             "page_php": 4,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_58",
             "rule_php": false,
             "note_php": false
           },
@@ -2149,7 +2153,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_70",
             "rule_php": false,
             "note_php": false
           },
@@ -2170,7 +2174,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_70",
             "rule_php": false,
             "note_php": false
           },
@@ -2185,7 +2189,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_70",
             "rule_php": false,
             "note_php": false
           },
@@ -2207,7 +2211,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_71",
             "rule_php": false,
             "note_php": false
           },
@@ -2228,7 +2232,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_71",
             "rule_php": false,
             "note_php": false
           },
@@ -2241,7 +2245,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_71",
             "rule_php": false,
             "note_php": false
           },
@@ -2262,7 +2266,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_71",
             "rule_php": false,
             "note_php": false
           },
@@ -2275,7 +2279,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_71",
             "rule_php": false,
             "note_php": false
           },
@@ -2297,7 +2301,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_72",
             "rule_php": false,
             "note_php": false
           },
@@ -2319,7 +2323,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_72",
             "rule_php": false,
             "note_php": false
           },
@@ -2341,7 +2345,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_72",
             "rule_php": false,
             "note_php": false
           },
@@ -2356,7 +2360,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_72",
             "rule_php": false,
             "note_php": false
           },
@@ -2487,7 +2491,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_78",
             "rule_php": false,
             "note_php": false
           },
@@ -2509,7 +2513,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_78",
             "rule_php": false,
             "note_php": false
           },
@@ -2531,7 +2535,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_78",
             "rule_php": false,
             "note_php": false
           },
@@ -2546,7 +2550,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_78",
             "rule_php": false,
             "note_php": false
           },
@@ -2696,7 +2700,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2716,7 +2720,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2736,7 +2740,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2756,7 +2760,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2776,7 +2780,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2796,7 +2800,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2811,7 +2815,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_85",
             "rule_php": false,
             "note_php": false
           },
@@ -2834,7 +2838,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_86",
             "rule_php": false,
             "note_php": false
           },
@@ -2856,7 +2860,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_86",
             "rule_php": false,
             "note_php": false
           },
@@ -2878,7 +2882,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_86",
             "rule_php": false,
             "note_php": false
           },
@@ -2900,7 +2904,7 @@
             "associated_status_field": false,
             "page_php": 6,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_86",
             "rule_php": false,
             "note_php": "Use the 'other' code for the child's behavior to the most familiar other adult in his/her pbl b.g., a grandmother, teacher, nanny or family friend."
           },
@@ -3341,7 +3345,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_96_unusual_preoccupations",
             "rule_php": false,
             "note_php": false
           },
@@ -3363,7 +3367,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_96_unusual_preoccupations",
             "rule_php": false,
             "note_php": false
           },
@@ -3378,7 +3382,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_96_unusual_preoccupations",
             "rule_php": false,
             "note_php": false
           },
@@ -3400,7 +3404,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_97_circumscribed_interests",
             "rule_php": false,
             "note_php": false
           },
@@ -3422,7 +3426,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_97_circumscribed_interests",
             "rule_php": false,
             "note_php": false
           },
@@ -3437,7 +3441,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_97_circumscribed_interests",
             "rule_php": false,
             "note_php": false
           },
@@ -3460,7 +3464,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_98_repetitive_use_objects_or_parts",
             "rule_php": false,
             "note_php": false
           },
@@ -3483,7 +3487,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_98_repetitive_use_objects_or_parts",
             "rule_php": false,
             "note_php": false
           },
@@ -3498,7 +3502,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_98_repetitive_use_objects_or_parts",
             "rule_php": false,
             "note_php": false
           },
@@ -3520,7 +3524,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_99_compulsions_rituals",
             "rule_php": false,
             "note_php": false
           },
@@ -3542,7 +3546,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_99_compulsions_rituals",
             "rule_php": false,
             "note_php": false
           },
@@ -3557,7 +3561,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_99_compulsions_rituals",
             "rule_php": false,
             "note_php": false
           },
@@ -3578,7 +3582,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_100_unusual_sensory_interests",
             "rule_php": false,
             "note_php": false
           },
@@ -3599,7 +3603,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_100_unusual_sensory_interests",
             "rule_php": false,
             "note_php": false
           },
@@ -3614,7 +3618,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_100_unusual_sensory_interests",
             "rule_php": false,
             "note_php": false
           },
@@ -3635,7 +3639,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_101_noise_sensitivity",
             "rule_php": false,
             "note_php": false
           },
@@ -3656,7 +3660,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_101_noise_sensitivity",
             "rule_php": false,
             "note_php": false
           },
@@ -3671,7 +3675,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_101_noise_sensitivity",
             "rule_php": false,
             "note_php": false
           },
@@ -3693,7 +3697,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_102_response_sensory_stimuli",
             "rule_php": false,
             "note_php": false
           },
@@ -3715,7 +3719,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_102_response_sensory_stimuli",
             "rule_php": false,
             "note_php": false
           },
@@ -3730,7 +3734,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_102_response_sensory_stimuli",
             "rule_php": false,
             "note_php": false
           },
@@ -3753,7 +3757,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_103_unusual_fears",
             "rule_php": false,
             "note_php": false
           },
@@ -3776,7 +3780,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_103_unusual_fears",
             "rule_php": false,
             "note_php": false
           },
@@ -3791,7 +3795,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_103_unusual_fears",
             "rule_php": false,
             "note_php": false
           },
@@ -3813,7 +3817,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_104_difficulty_minor_routine_changes",
             "rule_php": false,
             "note_php": false
           },
@@ -3835,7 +3839,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_104_difficulty_minor_routine_changes",
             "rule_php": false,
             "note_php": false
           },
@@ -3850,7 +3854,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_104_difficulty_minor_routine_changes",
             "rule_php": false,
             "note_php": false
           },
@@ -3872,7 +3876,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_105_resist_environment_changes",
             "rule_php": false,
             "note_php": false
           },
@@ -3894,7 +3898,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_105_resist_environment_changes",
             "rule_php": false,
             "note_php": false
           },
@@ -3909,7 +3913,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_105_resist_environment_changes",
             "rule_php": false,
             "note_php": false
           },
@@ -3932,7 +3936,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_106_unusual_attachment_objects",
             "rule_php": false,
             "note_php": false
           },
@@ -3955,7 +3959,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_106_unusual_attachment_objects",
             "rule_php": false,
             "note_php": false
           },
@@ -3970,7 +3974,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_106_unusual_attachment_objects",
             "rule_php": false,
             "note_php": false
           },
@@ -3981,7 +3985,7 @@
             "enum_values_loris": ["0", "1", "2", "3", "8", "9"],
             "enum_values_php": [
               "no hand and finger mannerisms",
-              "gecasional hand and finger mannerisms only or type not as clearly specified as for rating of '2'",
+              "occasional hand and finger mannerisms only or type not as clearly specified as for rating of '2'",
               "definite, frequent hand mannerisms or finger flicking/awisting, but no interference with other activities or distress if interrupted",
               "marked mannerisms of bype specified; associated with social impairment or distress when interrupted or seldom interruption due to others' concern about child's reaction",
               "N/A (e.g., physically disabled)",
@@ -4003,7 +4007,7 @@
             "enum_values_loris": ["0", "1", "2", "3", "8", "9"],
             "enum_values_php": [
               "no hand and finger mannerisms",
-              "gecasional hand and finger mannerisms only or type not as clearly specified as for rating of '2'",
+              "occasional hand and finger mannerisms only or type not as clearly specified as for rating of '2'",
               "definite, frequent hand mannerisms or finger flicking/awisting, but no interference with other activities or distress if interrupted",
               "marked mannerisms of bype specified; associated with social impairment or distress when interrupted or seldom interruption due to others' concern about child's reaction",
               "N/A (e.g., physically disabled)",
@@ -4014,7 +4018,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_107_hand_finger_mannerisms",
             "rule_php": false,
             "note_php": false
           },
@@ -4029,7 +4033,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_107_hand_finger_mannerisms",
             "rule_php": false,
             "note_php": false
           },
@@ -4050,7 +4054,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_108_midline_hand_movements",
             "rule_php": false,
             "note_php": false
           },
@@ -4071,7 +4075,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_108_midline_hand_movements",
             "rule_php": false,
             "note_php": false
           },
@@ -4086,7 +4090,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_108_midline_hand_movements",
             "rule_php": false,
             "note_php": false
           },
@@ -4108,7 +4112,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_109_complex_mannerisms_body_movements",
             "rule_php": false,
             "note_php": false
           },
@@ -4130,7 +4134,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_109_complex_mannerisms_body_movements",
             "rule_php": false,
             "note_php": false
           },
@@ -4145,7 +4149,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_109_complex_mannerisms_body_movements",
             "rule_php": false,
             "note_php": false
           },
@@ -4167,7 +4171,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_110_rocking",
             "rule_php": false,
             "note_php": false
           },
@@ -4189,7 +4193,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_110_rocking",
             "rule_php": false,
             "note_php": false
           },
@@ -4204,7 +4208,7 @@
             "associated_status_field": false,
             "page_php": 7,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_110_rocking",
             "rule_php": false,
             "note_php": false
           },
@@ -4227,7 +4231,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_111_gait",
             "rule_php": false,
             "note_php": false
           },
@@ -4250,7 +4254,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_111_gait",
             "rule_php": false,
             "note_php": false
           },
@@ -4265,7 +4269,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_111_gait",
             "rule_php": false,
             "note_php": false
           },
@@ -4276,8 +4280,8 @@
             "enum_values_loris": ["0", "1", "2", "8", "9"],
             "enum_values_php": [
               "no aggression or extremely rare and minor",
-              "gecasional mild aggressiveness only (threatening without physical contact; or behavior that might represent unduly rough play or momentary, provoked lashing out)",
-              "eecasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or frequent mild aggression as described above",
+              "occasional mild aggressiveness only (threatening without physical contact; or behavior that might represent unduly rough play or momentary, provoked lashing out)",
+              "occasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or frequent mild aggression as described above",
               "frequent physical aggression as described above",
               "N/A",
               "N/K or not asked"
@@ -4287,7 +4291,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_112_aggression_caregiver_or_family",
             "rule_php": false,
             "note_php": false
           },
@@ -4298,8 +4302,8 @@
             "enum_values_loris": ["0", "1", "2", "8", "9"],
             "enum_values_php": [
               "no aggression or extremely rare and minor",
-              "gecasional mild aggressiveness only (threatening without physical contact; or behavior that might represent unduly rough play or momentary, provoked lashing out)",
-              "eecasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or frequent mild aggression as described above",
+              "occasional mild aggressiveness only (threatening without physical contact; or behavior that might represent unduly rough play or momentary, provoked lashing out)",
+              "occasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or frequent mild aggression as described above",
               "frequent physical aggression as described above",
               "N/A",
               "N/K or not asked"
@@ -4309,7 +4313,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_112_aggression_caregiver_or_family",
             "rule_php": false,
             "note_php": false
           },
@@ -4324,7 +4328,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_112_aggression_caregiver_or_family",
             "rule_php": false,
             "note_php": false
           },
@@ -4336,7 +4340,7 @@
             "enum_values_php": [
               "no aggression or extremely rare and minor",
               "occasional mild aggressiveness only (threatening without physical contact; or behavior that might represent unduly rough play or momentary, provoked lashing out)",
-              "vecasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or freguent mild aggression as described above",
+              "occasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or freguent mild aggression as described above",
               "frequent physical aggression as described above",
               "N/A",
               "N/K or not asked"
@@ -4346,7 +4350,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_113_aggression_non_caregiver_non_family",
             "rule_php": false,
             "note_php": false
           },
@@ -4358,7 +4362,7 @@
             "enum_values_php": [
               "no aggression or extremely rare and minor",
               "occasional mild aggressiveness only (threatening without physical contact; or behavior that might represent unduly rough play or momentary, provoked lashing out)",
-              "vecasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or freguent mild aggression as described above",
+              "occasional but definite physical aggression involving biting or hitting, or pushing hard enough to hurt someone or freguent mild aggression as described above",
               "frequent physical aggression as described above",
               "N/A",
               "N/K or not asked"
@@ -4368,7 +4372,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_113_aggression_non_caregiver_non_family",
             "rule_php": false,
             "note_php": false
           },
@@ -4383,7 +4387,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_113_aggression_non_caregiver_non_family",
             "rule_php": false,
             "note_php": false
           },
@@ -4405,7 +4409,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_114_self_injury",
             "rule_php": false,
             "note_php": false
           },
@@ -4427,7 +4431,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_114_self_injury",
             "rule_php": false,
             "note_php": false
           },
@@ -4442,7 +4446,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_114_self_injury",
             "rule_php": false,
             "note_php": false
           },
@@ -4463,7 +4467,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_115_hyperventilation",
             "rule_php": false,
             "note_php": false
           },
@@ -4484,7 +4488,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_115_hyperventilation",
             "rule_php": false,
             "note_php": false
           },
@@ -4499,7 +4503,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_115_hyperventilation",
             "rule_php": false,
             "note_php": false
           },
@@ -4514,7 +4518,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_116_faints_fits_blackouts",
             "rule_php": false,
             "note_php": false
           },
@@ -4536,7 +4540,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_116_faints_fits_blackouts",
             "rule_php": false,
             "note_php": false
           },
@@ -4551,7 +4555,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_116_faints_fits_blackouts",
             "rule_php": false,
             "note_php": false
           },
@@ -4573,7 +4577,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_117",
             "rule_php": false,
             "note_php": false
           },
@@ -4595,7 +4599,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_117",
             "rule_php": false,
             "note_php": false
           },
@@ -4614,7 +4618,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_118",
             "rule_php": false,
             "note_php": false
           },
@@ -4633,7 +4637,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_118",
             "rule_php": false,
             "note_php": false
           },
@@ -4652,7 +4656,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_119",
             "rule_php": false,
             "note_php": false
           },
@@ -4671,7 +4675,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_119",
             "rule_php": false,
             "note_php": false
           },
@@ -4691,7 +4695,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_120",
             "rule_php": false,
             "note_php": false
           },
@@ -4711,7 +4715,7 @@
             "associated_status_field": false,
             "page_php": 8,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_120",
             "rule_php": false,
             "note_php": false
           },
@@ -4831,7 +4835,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_126",
             "rule_php": false,
             "note_php": false
           },
@@ -4852,7 +4856,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_126",
             "rule_php": false,
             "note_php": false
           },
@@ -4873,7 +4877,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_127",
             "rule_php": false,
             "note_php": false
           },
@@ -4894,7 +4898,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_127",
             "rule_php": false,
             "note_php": false
           },
@@ -4915,7 +4919,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_128",
             "rule_php": false,
             "note_php": false
           },
@@ -4936,7 +4940,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_128",
             "rule_php": false,
             "note_php": false
           },
@@ -4957,7 +4961,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_129",
             "rule_php": false,
             "note_php": false
           },
@@ -4978,7 +4982,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_129",
             "rule_php": false,
             "note_php": false
           },
@@ -4999,7 +5003,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_130",
             "rule_php": false,
             "note_php": false
           },
@@ -5020,7 +5024,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_130",
             "rule_php": false,
             "note_php": false
           },
@@ -5041,7 +5045,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_131",
             "rule_php": false,
             "note_php": false
           },
@@ -5062,7 +5066,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_131",
             "rule_php": false,
             "note_php": false
           },
@@ -5083,7 +5087,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_132",
             "rule_php": false,
             "note_php": false
           },
@@ -5104,7 +5108,7 @@
             "associated_status_field": false,
             "page_php": 9,
             "hidden_on_php": false,
-            "group_php": false,
+            "group_php": "q_132",
             "rule_php": false,
             "note_php": false
           }
@@ -5131,7 +5135,8 @@
         "q_20": {
             "group_fields": [
                 "q_20_babbling_infant",
-                "q_20_babbling_infant_worsening"
+                "q_20_babbling_infant_worsening", 
+                "q_20_age_babbling_infant_worsening"
             ],
             "group_front_text_php": "20. Babbling as an infant",
             "type": "question"

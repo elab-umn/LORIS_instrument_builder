@@ -1,0 +1,5 @@
+{% for pg in range(1, pages.npages + 1) %}
+INSERT INTO test_subgroups (`Subgroup_name`, `group_order`) VALUES ('{{ pages["page" ~ pg].page_name }}', {{ pages["page" ~ pg].order }});    
+UPDATE test_names SET Sub_group = (SELECT ID FROM test_subgroups WHERE Subgroup_name = {{ pages["page" ~ pg].page_name }})
+    ( '{{ instrument.sql_table_name }}', '{{ instrument.instrument_name }}', 1 ); 
+{% endfor %}

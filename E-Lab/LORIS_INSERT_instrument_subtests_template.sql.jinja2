@@ -1,0 +1,4 @@
+INSERT INTO `instrument_subtests` (`Test_name`, `Subtest_name`, `Description`, `Order_number`) VALUES 
+{% for pg in range(1, pages.npages + 1) %}
+    ('{{ instrument.sql_table_name }}', '{{ instrument.sql_table_name ~ "_" ~ pages["page" ~ pg].page_name }}', '{{ pages["page" ~ pg].title }}', {{ pages["page" ~ pg].order }}){{ "," if not loop.last else ";" }}
+{% endfor %}
