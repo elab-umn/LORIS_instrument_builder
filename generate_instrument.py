@@ -243,7 +243,7 @@ def convert_instrument_template(instrument_json_path, **kwargs):
 def generate_instrument_sql(instrument_data): 
     
     # ----------------------- INSERT into test_names table ----------------------- #
-    with open("LORIS_INSERT_test_names_template.sql.jinja2") as filein:  # noqa
+    with open("templates/LORIS_INSERT_test_names_template.sql.jinja2") as filein:  # noqa
         test_names_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
         # TODO: add support for instrument subgroup input
         
@@ -259,7 +259,7 @@ def generate_instrument_sql(instrument_data):
     #     output.write(test_names_template.render(instrument_data))
     
     # --------------------- INSERT into test_subgroups table --------------------- #
-    with open("LORIS_INSERT_instrument_subtests_template.sql.jinja2") as filein:  # noqa
+    with open("templates/LORIS_INSERT_instrument_subtests_template.sql.jinja2") as filein:  # noqa
         instrument_subtest_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
         
     with open("outputs/sql/instrument_subtests_INSERT_" + instrument_data["instrument"]["sql_table_name"] + ".sql", "w") as output: 
@@ -268,7 +268,7 @@ def generate_instrument_sql(instrument_data):
     # ---------------------- INSERT into test_battery table ---------------------- #
     
 
-def generate_instrument_from_template(path):
+def generate_instrument_from_template(path, output_dir):
     '''
     read_instrument_template: 
 
@@ -286,49 +286,49 @@ def generate_instrument_from_template(path):
     # ============================================================================ #
     # generate_instrument_sql(inst)
     # -------------------------- CREATE instrument table ------------------------- #
-    with open("LORIS_CREATE_instrument_table_template.sql.jinja2") as filein:  # noqa
+    with open("templates/LORIS_CREATE_instrument_table_template.sql.jinja2") as filein:  # noqa
         create_table_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
         
-    with open("outputs/sql/intrument_CREATE_" + inst["instrument"]["sql_table_name"] + ".sql", "w") as output: 
+    with open(os.path.join(output_dir, "sql", f"intrument_CREATE_{inst['instrument']['sql_table_name']}.sql"), "w+") as output: 
         output.write(create_table_template.render(inst))
     
     # ----------------------- INSERT into test_names table ----------------------- #
-    with open("LORIS_INSERT_test_names_template.sql.jinja2") as filein:  # noqa
+    with open("templates/LORIS_INSERT_test_names_template.sql.jinja2") as filein:  # noqa
         test_names_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
         # TODO: add support for instrument subgroup input
         
-    with open("outputs/sql/test_names_INSERT_" + inst["instrument"]["sql_table_name"] + ".sql", "w") as output: 
+    with open(os.path.join(output_dir, "sql", "test_names_INSERT_" + inst["instrument"]["sql_table_name"] + ".sql"), "w+") as output: 
         output.write(test_names_template.render(inst))
     
     #  --------------------- INSERT into test_subgroups table --------------------- #
-    with open("LORIS_INSERT_instrument_subtests_template.sql.jinja2") as filein:  # noqa
+    with open("templates/LORIS_INSERT_instrument_subtests_template.sql.jinja2") as filein:  # noqa
         instrument_subtest_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
         
-    with open("outputs/sql/instrument_subtests_INSERT_" + inst["instrument"]["sql_table_name"] + ".sql", "w") as output: 
+    with open(os.path.join(output_dir, "sql", "instrument_subtests_INSERT_" + inst["instrument"]["sql_table_name"] + ".sql"), "w+") as output: 
         output.write(instrument_subtest_template.render(inst))
     
     # ============================================================================ #
     #                            generate PHP instrument                           #
     # ============================================================================ #
     
-    with open("LORIS_instrument_builder_php_template.html.jinja2") as filein:
+    with open("templates/LORIS_instrument_builder_php_template.html.jinja2") as filein:
         loris_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
     
     # ------------------ compile instrument with jinja template ------------------ #
-    with open("outputs/php/NDB_BVL_Instrument_" + inst["instrument"]["sql_table_name"] + ".class.inc", "w") as output: 
+    with open(os.path.join(output_dir, "php", "NDB_BVL_Instrument_" + inst["instrument"]["sql_table_name"] + ".class.inc"), "w+") as output: 
         output.write(loris_template.render(inst))
         # output.write(inst_php)
     
     
-generate_instrument_from_template("adi_r_toddler_instrument_details.json")
-t1 = convert_instrument_template("adi_r_toddler_instrument_details.json")
-t1.keys()
-sorted(t1['pages'])
-t1["pages"]
-t1["groups"].keys()
-t1["groups"]["group_1"].keys()
-t1["groups"]["group_1"]["type"]
-t1["fields"]["field11"]
-t1["fields"]["field11"].keys()
-t1["fields"]["field26"].keys()
-t1["fields"]["field247"]
+# generate_instrument_from_template("E-Lab/adi_r_toddler_instrument_details.json")
+# t1 = convert_instrument_template("E-Lab/adi_r_toddler_instrument_details.json")
+# t1.keys()
+# sorted(t1['pages'])
+# t1["pages"]
+# t1["groups"].keys()
+# t1["groups"]["group_1"].keys()
+# t1["groups"]["group_1"]["type"]
+# t1["fields"]["field11"]
+# t1["fields"]["field11"].keys()
+# t1["fields"]["field26"].keys()
+# t1["fields"]["field247"]
