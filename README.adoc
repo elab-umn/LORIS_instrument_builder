@@ -2,7 +2,24 @@
 
 Python scripts to configure and build instruments in LORIS
 
-This repository has a number of scripts and classes that are useful to automatically building instruments for LORIS. In general, it is essential to know which data will be stored in the SQL, which data will be displayed in the PHP instrument, and the mapping between the datatypes in SQL and PHP. 
+This repository has a number of scripts and classes that are useful to automatically building instruments for LORIS. In general, it is essential to know which data will be stored in the SQL, which data will be displayed in the PHP instrument, and the mapping between the datatypes in SQL and PHP.
+
+== Running the script
+
+From the LORIS_INSTRUMENT_BUILDER directory run `./instrument_builder.py`.
+Must include either path or source flag.
+
+=== Flags
+. --path
+** path to an instrument details JSON file
+** Example command: `./instrument_builder.py --path examples/EXAMPLE_instrument_details.json`
+. --source
+** database to pull metadata from. Creates an instrument for each instrument in the source.
+** currently implemented sources: `redcap`
+** Example command: `./instrument_builder.py --source redcap`
+. --output_dir, -o
+** optional path to an output directory. Defaults to `outputs`
+** creates the directory if it does not already exist.
 
 .Steps to build an instrument with the LORIS_instrument_builder
 . Build a `.json` file outlining the fields in the SQL table. The `.json` file also links these SQL fields with how the data will appear in PHP. 
