@@ -13,7 +13,7 @@ def clean_strings_for_php(input: str):
     '''
     return re.sub('\n', '<br/>', re.sub('"', '\"', input))
 
-def convert_instrument_template(instrument_json_path, **kwargs):   
+def convert_instrument_template(instrument_information, **kwargs):   
     '''
     create_instrument_php:
         generates php file for instrument 
@@ -28,9 +28,8 @@ def convert_instrument_template(instrument_json_path, **kwargs):
         'select': ['enum'], 
         'date': ['date']}
     
-    # convert to dictionary of instrument parameters
-    with open(instrument_json_path) as json_file: 
-        instrument_information = json.load(json_file)
+    # convert to dictionary of instrument parameters 
+    # instrument_information = json.load(instrument_json)
     
     # ============================================================================ #
     #                  parse parameters from instrument json file                  #
@@ -54,11 +53,11 @@ def convert_instrument_template(instrument_json_path, **kwargs):
         if isinstance(instrument_information["instrument_name_loris"], str):
             instrument_parameters["sql_table_name"] = instrument_information["instrument_name_loris"] 
             if (len(instrument_information["instrument_name_loris"]) >= 64): 
-                raise ValueError(f'String value for `instrument_name_loris` must be 64 characters or less.\nInput value is = {len(instrument_information["instrument_name_loris"])}, which is {len(instrument_information["instrument_name_loris"])} charaters long.\nPlease update {instrument_json_path} with a valid SQL table name.')
+                raise ValueError(f'String value for `instrument_name_loris` must be 64 characters or less.\nInput value is = {instrument_information["instrument_name_loris"]}, which is {len(instrument_information["instrument_name_loris"])} charaters long.\nPlease update with a valid SQL table name.')
             if (bool(re.search(r"\s", instrument_information["instrument_name_loris"]))): 
-                raise ValueError(f'String value for `instrument_name_loris` cannot contain spaces.\nInput value is = {len(instrument_information["instrument_name_loris"])}.\nPlease update {instrument_json_path} with a valid SQL table name.')
+                raise ValueError(f'String value for `instrument_name_loris` cannot contain spaces.\nInput value is = {instrument_information["instrument_name_loris"]}.\nPlease update with a valid SQL table name.')
     except KeyError as err: 
-        raise KeyError(f"[from create_instrument_php()] the file {instrument_json_path} does not contain the key `instrument_name_loris` which is required. Update json file. ")
+        raise KeyError(f"[from create_instrument_php()] the input instrument json does not contain the key `instrument_name_loris` which is required. Update json file. ")
     
     # parse other instrument level parameters, besides `instrument_name_loris`
     for inst_param in json_keys_instrument_parameters[0:]: 
@@ -268,7 +267,7 @@ def generate_instrument_sql(instrument_data):
     # ---------------------- INSERT into test_battery table ---------------------- #
     
 
-def generate_instrument_from_template(path, output_dir):
+def generate_instrument_from_template(instrument_json, output_dir):
     '''
     read_instrument_template: 
 
@@ -279,7 +278,7 @@ def generate_instrument_from_template(path, output_dir):
     # TODO: update this function to add folders if they don't exist in the current working directory. 
     
     # read instrument template
-    inst = convert_instrument_template(path)
+    inst = convert_instrument_template(instrument_json)
     
     # ============================================================================ #
     #                            generate SQL statements                           #
