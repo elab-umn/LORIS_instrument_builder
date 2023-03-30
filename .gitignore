@@ -138,3 +138,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Ignore outputs
+outputs/
+
+# config
+redcap_config.py
