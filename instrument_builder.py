@@ -4,7 +4,7 @@ import argparse
 import os
 import json
 
-from validate import instrument_json, data_source, directory
+from validate import instrument_json, directory
 from generate_instrument import generate_instrument_from_template
 from redcap import all_metadata_to_instrument_jsons
 
@@ -53,7 +53,7 @@ def parse_args():
     )
     parser.add_argument(
         "--source",
-        type=data_source,
+        choices=['redcap', 'qualtrics'],
         help="A supported data source."
     )
     return parser.parse_args()
