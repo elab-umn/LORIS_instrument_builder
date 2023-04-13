@@ -164,14 +164,14 @@ def metadata_to_instrument_json(metadata, form):
 
     instrument_data = {
         "instrument_name": form,
-        "instrument_name_loris": form,
+        "instrument_name_sql": form,
         "pages": {},
         "fields": {
             f"field{index + 1}": { 
-                "field_name_loris": field["field_name"],
+                "field_name_sql": field["field_name"],
                 "field_front_text_php": field["field_label"],
-                "field_type_loris": field_type_lookup(field),
-                "enum_values_loris": make_enum_array(field)[0],
+                "field_type_sql": field_type_lookup(field),
+                "enum_values_sql": make_enum_array(field)[0],
                 "enum_values_php": make_enum_array(field)[1],
                 "field_include_not_answered": False,
                 "field_default_value": False,

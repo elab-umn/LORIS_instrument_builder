@@ -37,7 +37,7 @@ This is a basic json file that contains all of the information to generate an in
 There are 6 main keys that are required: 
 
 [horizontal]
-instrument_name_loris:: The name of the SQL table. Best practice dictates that tables should follow the https://github.com/aces/Loris/blob/main/docs/SQLModelingStandard.md[LORIS conventions] for naming SQL tables in snake_case, which means they should be all lowercase with words separated by underscores (i.e. instrument_name, _not_ InstrumentName). 
+instrument_name_sql:: The name of the SQL table. Best practice dictates that tables should follow the https://github.com/aces/Loris/blob/main/docs/SQLModelingStandard.md[LORIS conventions] for naming SQL tables in snake_case, which means they should be all lowercase with words separated by underscores (i.e. instrument_name, _not_ InstrumentName). 
 metadata_fields::
 validity_enabled::
 validity_required::

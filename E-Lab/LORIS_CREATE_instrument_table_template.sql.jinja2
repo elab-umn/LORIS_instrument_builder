@@ -7,8 +7,8 @@ CREATE TABLE `{{ instrument.sql_table_name }}` (
     `Date_taken` date DEFAULT NULL,
     `Candidate_Age` varchar(255) DEFAULT NULL,
     `Window_Difference` int(11) DEFAULT NULL,
-    {% for q in fields.keys() %}{% if "HEADER:" not in fields[q]["field_name_loris"] %}
-    {{ "`" ~ fields[q]["field_name_loris"] ~ "`"}} {{ fields[q]["field_type_loris"] }}{% if fields[q]["field_type_loris"] == "enum" %}{% for val in fields[q]["enum_values_loris"] %}{{"(" if loop.first}}"{{val}}"{{', "not_answered"' if loop.last and fields[q]["field_include_not_answered"] != false}}{{"," if not loop.last else ")"}}{% endfor%}{% endif %}{% if fields[q]["field_not_null"] is defined %}{% if fields[q]["field_not_null"] != false %}{{ fields[q]["field_not_null"] }}{% else %} DEFAULT NULL {% endif %} {% endif %},
+    {% for q in fields.keys() %}{% if "HEADER:" not in fields[q]["field_name_sql"] %}
+    {{ "`" ~ fields[q]["field_name_sql"] ~ "`"}} {{ fields[q]["field_type_sql"] }}{% if fields[q]["field_type_sql"] == "enum" %}{% for val in fields[q]["enum_values_sql"] %}{{"(" if loop.first}}"{{val}}"{{', "not_answered"' if loop.last and fields[q]["field_include_not_answered"] != false}}{{"," if not loop.last else ")"}}{% endfor%}{% endif %}{% if fields[q]["field_not_null"] is defined %}{% if fields[q]["field_not_null"] != false %}{{ fields[q]["field_not_null"] }}{% else %} DEFAULT NULL {% endif %} {% endif %},
     {% endif %}{% endfor %}
     PRIMARY KEY (`CommentID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
