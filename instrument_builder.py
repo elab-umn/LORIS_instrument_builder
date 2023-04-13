@@ -4,17 +4,17 @@ import argparse
 import os
 import json
 
-from validate import valid_readable_file, DataSource, Directory
+from validate import instrument_json, data_source, directory
 from generate_instrument import generate_instrument_from_template
 from redcap import all_metadata_to_instrument_jsons
 
 def main():
     args = parse_args()
     path = args.path
-    source = args.source.__str__()
+    source = args.source
 
     # Make output directories
-    output_dir = args.output_dir.directory
+    output_dir = args.output_dir
     if not os.path.exists(os.path.join(output_dir, "php")):
         os.makedirs(os.path.join(output_dir, "php"))
     if not os.path.exists(os.path.join(output_dir, "sql")):
@@ -42,18 +42,18 @@ def parse_args():
         "-o", "--output_dir",
         dest="output_dir",
         default="outputs",
-        type=Directory,
+        type=directory,
         help="Valid file path to output directory."
     )
     parser.add_argument(
         "--path",
-        type=valid_readable_file,
+        type=instrument_json,
         help=("Valid path to instrument details json file. "
               "See EXAMPLE_instrument_details.json")
     )
     parser.add_argument(
         "--source",
-        type=DataSource,
+        type=data_source,
         help="A supported data source."
     )
     return parser.parse_args()
