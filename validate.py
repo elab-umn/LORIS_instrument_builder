@@ -7,12 +7,6 @@ def directory(directory):
         os.makedirs(directory)
     return directory
 
-def data_source(source):
-    valid_sources = ["redcap", "qualtrics"]
-    if source in valid_sources:
-        return source
-    else:
-        raise argparse.ArgumentTypeError("\n{} is not a valid datasource. Please choose from {}".format(source, valid_sources))
     
 def instrument_json(file):
     expected_keys = ["instrument_name", "instrument_name_sql", "metadata_fields", "validity_enabled", "validity_required", "pages", "fields", "groups"]
