@@ -1,9 +1,10 @@
 import requests
 import json
-from redcap_config import token, api_route
+import configparser
 import pandas as pd
+import os
 
-def get_metadata():
+def get_metadata(redcap_config = os.path.join('config','redcap_config.ini'), db = 'redcap'):
     '''
     Gets REDCap metadata from the API. See get_data
 
@@ -12,6 +13,26 @@ def get_metadata():
     result: dictionary
         metadata from the REDCap API call
     '''
+
+    # Read config file for database connections
+    config = configparser.ConfigParser()
+    try:
+        with open(redcap_config) as f:
+            config.read_file(f)
+    except IOError:
+        raise FileNotFoundError(
+            "database config file ({dbconfig}) not found. Check script directory or path to {dbconfig}"
+        )
+
+    # check config information is available, and connect to the databse selected
+    if config.has_section(db):
+        token = config.get(db, "token")
+        api_route = config.get(db, "api_route")
+
+    else:
+        # failsafe is config doesn't have expecated connection information
+        raise RuntimeError("CONFIG ERROR -- Something went wrong. DB connection not found in {dbconfig} file.")    
+
     data = {
         'token': f'{token}',
         'content': 'metadata',
