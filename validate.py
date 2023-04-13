@@ -22,48 +22,46 @@ def instrument_json(file):
 
         with open(path) as json_file:
             json_dict = json.load(json_file)
-            
+
         for key in expected_keys:
             if not key in json_dict:
                 raise argparse.ArgumentTypeError(f"\nInvalid instrument JSON:\nmissing key: {key}")
+            
+        pages = [ json_dict["pages"][page]["order"] for page in json_dict["pages"] ]
+        pages.append(0)
 
         for field in json_dict["fields"]:
-            validate_field(field, json_dict["fields"][field])
+            validate_field(field, json_dict["fields"][field], pages)
 
         return path
     except (AssertionError):
         raise argparse.ArgumentTypeError(f"\nCannot read file at {file}")
     
-def validate_field(field_name, field_values):
+def validate_field(field_name, field_values, pages):
+    # checks for requried keys
     required_keys = [
         "field_name_loris",
-        "field_front_text_php",
-        "field_type_loris"
+        "field_type_loris",
+        "page_php"
     ]
-
-    # field_defaults = {
-    #     "field_include_not_answered": False,
-    #     "field_default_value": False,
-    #     "associated_status_field": False,
-    #     "page_php": 0,
-    #     "hidden_on_php": False,
-    #     "group_php": False,
-    #     "rule_php": False,
-    #     "note_php": False
-    # }
-
     for key in required_keys:
         if not key in field_values:
-            raise argparse.ArgumentTypeError(f"\nInvalid field '{field_name}' in instrument JSON:\nmissing key: {key}")
+            raise argparse.ArgumentTypeError(f"\nInvalid field '{field_name}' in instrument JSON:\nmissing key: '{key}'")
 
-    # for field in field_defaults.keys():
-    #     if field not in field_values:
-    #         field_values[field] = field_defaults[field]
+    # field must have a php front text if its not hidden
+    if "hidden_on_php" in field_values:
+        if not field_values["hidden_on_php"]:
+            if "field_front_text_php" not in field_values:
+                raise argparse.ArgumentTypeError(f"\nInvalid field '{field_name}' in instrument JSON:\nmissing key: 'field_front_text_php'")
 
+    # if it's an enum field, it must list its values.
     if field_values["field_type_loris"] == "enum":
         if not "enum_values_loris" in field_values.keys():
             raise argparse.ArgumentTypeError(f"\nInvalid field '{field_name}' in instrument JSON\nmissing key 'enum_values_loris'")
-        if not "enum_values_php" in field_values.keys():
-            raise argparse.ArgumentTypeError(f"\nInvalid field '{field_name}' in instrument JSON:\nmissing key 'enum_values_php'")
-        if len(field_values["enum_values_loris"]) != len(field_values["enum_values_php"]):
-            raise argparse.ArgumentTypeError(f"\nInvalid Field '{field_name}' in instrument JSON:\n'enum_values_php' must be same length as 'enum_values_loris'")
+        # Reuses sql values as php values if php values not defined. otherwise they must be the same length.
+        if "enum_values_php" in field_values.keys():
+            if len(field_values["enum_values_loris"]) != len(field_values["enum_values_php"]):
+                raise argparse.ArgumentTypeError(f"\nInvalid Field '{field_name}' in instrument JSON:\n'enum_values_php' must be same length as 'enum_values_loris'")
+            
+    if field_values["page_php"] not in pages:
+        raise argparse.ArgumentTypeError(f"\nInvalid field '{field_name}' in instrument JSON\ninvalid page number: {field_values['page_php']}")
