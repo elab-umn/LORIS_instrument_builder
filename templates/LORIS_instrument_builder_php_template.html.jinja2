@@ -67,6 +67,126 @@ class NDB_BVL_Instrument_{{ instrument.sql_table_name }} extends NDB_BVL_Instrum
         }
     }
 
+    function addTableGroup(&$form, $tabledata, $groupName, $header=NULL, $rowHeader=NULL) { 
+        if (!is_null($header)) {
+            $form->addElement("header", null, $header);
+        }
+        $columns = $tabledata["columns"]; 
+        $rows = $tabledata["rows"]; 
+
+        foreach ($columns as $key => $column_data) {
+            if (is_array($column_data)) {
+                $group[] = $form->createElement('static', null, $column_data["title"] . "     ");
+            } else {
+                $group[] = $form->createElement('static', null, $column_data . "     ");
+            }
+        }
+        // $this->form->addGroup($group, 'score_header_group1', "<strong>Scale Subtest</strong>", $this->_GUIDelimiter, false);
+        // unset($group);
+        $form->addGroup($group, $groupName, (!is_null($rowHeader) ? $rowHeader : ""), $this->_GUIDelimiter, false);
+        unset($group);
+
+        $ncols = count($columns);  
+        $rowtype = "basic_question_array";
+
+        foreach ($rows as $row=>$qs) {
+            // check if $rows is an array with key "fields" that corresponds to the fields in that row, or "field_base" which is used with the "prepend_field" and/or "field_append keys" 
+            $rowtype = (is_array($qs) and array_key_exists("fields", $qs)) ? "detail_question_array" : ((array_key_exists("field_base", $qs)) ? "basic_question_array" : (is_string($row) and is_string($qs) ? "simple_associative_array": (is_string($qs) ? "simple_array" : "UNKNOWN")));
+            // error_log(print_r("Row type is " . $rowtype . "\n"));
+            for ($i = 0; $i < $ncols; $i++) {
+                // $form->addElement("static", null, $qs["label"] . array_values($columns)[$i]["title"], null, null); 
+                // $form->addElement("static", null, $qs["label"] . " - " . array_values($columns)[$i]["title"] . ": " . $row . array_values($columns)[$i]["field_append"], null, null); 
+                // error_log(print_r("Column " . array_values($qs["fields"])[$i] . '\n'));
+                if ($rowtype == "detail_question_array") {
+                    // check that there's actually a field provided
+                    if ($i <= count($qs["fields"]) ) {
+                        // check if the first item in "fields" is an array of item properties
+                        if (is_array(array_values($qs["fields"])[$i])) {
+                            // error_log(print_r("Adding element from detailed_question_array where " . $i . " element is an array: " . array_keys($qs["fields"])[$i] . '\n'));
+                            $group[] = $form->createElement(
+                                //if the fields data has a type specified, assign for individual fields, otherwise check the row type, otherwise static
+                                (array_key_exists("type", array_values($qs["fields"])[$i])) ? 
+                                    array_values($qs["fields"])[$i]["type"] : 
+                                    (array_key_exists("type", $qs) ? 
+                                        $qs["type"] : 
+                                        "static"),
+                                // (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . array_values($qs["fields"])[$i]["field"] . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : ""),
+                                array_values($qs["fields"])[$i]["field"], //NOTE field required for each element
+                                (array_key_exists("label", array_values($qs["fields"])[$i])) ? 
+                                    array_values($qs["fields"])[$i]["label"] : 
+                                    (array_key_exists("label", $qs) ? 
+                                        $qs["label"] . " - " . array_values($columns)[$i]["title"] : 
+                                        array_values($qs["fields"])[$i]["field"]), 
+                                (array_key_exists("options", array_values($qs["fields"])[$i])) ? 
+                                        array_values($qs["fields"])[$i]["options"] : 
+                                        null, 
+                                (array_key_exists("custom", array_values($qs["fields"])[$i])) ? 
+                                        array_values($qs["fields"])[$i]["custom"] : 
+                                        null
+                                        // $qs["label"] . " - " . array_values($columns)[$i]["title"], 
+                            );
+                        } else {
+                        // otherwise, we just assume it's a basic array with fields
+                            // error_log(print_r("Adding element from detailed_question_array where " . $i . " element is NOT an array, and the element is " . (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . array_values($qs["fields"])[$i] . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") . "\n"));
+                            $group[] = $form->createElement(
+                                //if the fields data has a type specified, assign for individual fields, otherwise check the row type, otherwise static
+                                (array_key_exists("type", $qs) ? $qs["type"] : "static"),
+                                // (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . array_values($qs["fields"])[$i] . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : ""),
+                                array_values($qs["fields"])[$i],
+                                (array_key_exists("label", $qs) ? 
+                                    $qs["label"] . " - " . array_values($columns)[$i]["title"] : 
+                                    array_values($qs["fields"])[$i]), 
+                                    null, 
+                                    null
+                                );
+
+                        }
+                    }
+                } elseif ($rowtype == "basic_question_array") {
+                    // error_log(print_r("Adding element from basic_question_array where " . (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . $qs["field_base"] . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") . " is the element\n"));
+                    // otherwise, we just assume it's a basic array with fields
+                    $group[] = $form->createElement(
+                        (array_key_exists("type", array_values($qs))) ? $qs["type"] : "static",
+                        (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . $qs["field_base"] . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") ,
+                        $qs["label"] . " - " . array_values($columns)[$i]["title"], 
+                        null, 
+                        null
+                    );
+                } elseif ($rowtype == "simple_associative_array") {
+                    // error_log(print_r("Adding element in simple_associative_array with field" . (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . $row . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") . " and row name " . $row)); 
+                    $group[] = $form->createElement(
+                        "static", 
+                        (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . $row . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") ,
+                        $qs . " - " . array_values($columns)[$i]["title"], 
+                        null, 
+                        null
+                    );
+                } elseif ($rowtype == "simple_array") {
+                    // error_log(print_r("Adding element in simple_associative_array with field" . (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . $qs . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") . " and label " . $qs . " - " . array_values($columns)[$i]["title"])); 
+                    $group[] = $form->createElement(
+                        "static", 
+                        (array_key_exists("prepend_field", array_values($columns)[$i]) ? array_values($columns)[$i]["prepend_field"] : "") . $qs . (array_key_exists("field_append", array_values($columns)[$i]) ? array_values($columns)[$i]["field_append"] : "") ,
+                        $qs . " - " . array_values($columns)[$i]["title"], 
+                        null, 
+                        null
+                    );
+                } else {
+                    // error_log(print_r("SOMETHING WENT WRONG\n"));
+                    $group[] = $form->createElement("static", null, "ERROR", null, null); 
+                }
+            }
+            if ($rowtype == "simple_array") {
+                $form->addGroup($group, "group_" .  $qs, $this->indent . $qs, $this->_GUIDelimiter, false);
+            } elseif ($rowtype == "simple_associative_array")  {
+                $form->addGroup($group, "group_" .  $row, $this->indent . $qs, $this->_GUIDelimiter, false);
+                // simple_associative_array doesn't seem to work as expected. 
+            } else {
+                $form->addGroup($group, "group_" .  $row, $this->indent . $qs["label"], $this->_GUIDelimiter, false);
+            }
+            unset($group);
+        }
+    }
+
     /**
      * sets up basic data, such as the HTML_Quickform object, and so on.
      *
