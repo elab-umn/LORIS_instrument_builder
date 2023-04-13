@@ -36,11 +36,11 @@ def convert_instrument_template(instrument_information, **kwargs):
     # ============================================================================ #
     
     instrument_parameters = {}
-    json_keys_instrument_parameters = ["instrument_name_loris", "instrument_name", "metadata_fields", "validity_enabled", "validity_required", "author"]
+    json_keys_instrument_parameters = ["instrument_name_sql", "instrument_name", "metadata_fields", "validity_enabled", "validity_required", "author"]
     pages_parameters = {}
     json_keys_pages_parameters = ["order", "title", "note_php"]
     field_parameters = {}
-    json_keys_field_parameters = ["field_name_loris", "field_front_text_php", "field_type_loris", "enum_values_loris", "enum_values_php", "field_include_not_answered", "field_default_value", "associated_status_field", "page_php", "hidden_on_php", "group_php", "rule_php", "note_php"]
+    json_keys_field_parameters = ["field_name_sql", "field_front_text_php", "field_type_sql", "enum_values_sql", "enum_values_php", "field_include_not_answered", "field_default_value", "associated_status_field", "page_php", "hidden_on_php", "group_php", "rule_php", "note_php"]
     group_parameters = {}
     json_keys_group_parameters = ["group_fields", "group_front_text_php", "type"]
     # TODO: add group validation 
@@ -48,18 +48,18 @@ def convert_instrument_template(instrument_information, **kwargs):
     # instrument_warnings = {}
     
     # ------------------------ parse instrument parameters ----------------------- #
-    # REQUIRED: must have a `instrument_name_loris` defined
+    # REQUIRED: must have a `instrument_name_sql` defined
     try: 
-        if isinstance(instrument_information["instrument_name_loris"], str):
-            instrument_parameters["sql_table_name"] = instrument_information["instrument_name_loris"] 
-            if (len(instrument_information["instrument_name_loris"]) >= 64): 
-                raise ValueError(f'String value for `instrument_name_loris` must be 64 characters or less.\nInput value is = {instrument_information["instrument_name_loris"]}, which is {len(instrument_information["instrument_name_loris"])} charaters long.\nPlease update with a valid SQL table name.')
-            if (bool(re.search(r"\s", instrument_information["instrument_name_loris"]))): 
-                raise ValueError(f'String value for `instrument_name_loris` cannot contain spaces.\nInput value is = {instrument_information["instrument_name_loris"]}.\nPlease update with a valid SQL table name.')
+        if isinstance(instrument_information["instrument_name_sql"], str):
+            instrument_parameters["sql_table_name"] = instrument_information["instrument_name_sql"] 
+            if (len(instrument_information["instrument_name_sql"]) >= 64): 
+                raise ValueError(f'String value for `instrument_name_sql` must be 64 characters or less.\nInput value is = {instrument_information["instrument_name_sql"]}, which is {len(instrument_information["instrument_name_sql"])} charaters long.\nPlease update with a valid SQL table name.')
+            if (bool(re.search(r"\s", instrument_information["instrument_name_sql"]))): 
+                raise ValueError(f'String value for `instrument_name_sql` cannot contain spaces.\nInput value is = {instrument_information["instrument_name_sql"]}.\nPlease update with a valid SQL table name.')
     except KeyError as err: 
-        raise KeyError(f"[from create_instrument_php()] the input instrument json does not contain the key `instrument_name_loris` which is required. Update json file. ")
+        raise KeyError(f"[from create_instrument_php()] the input instrument json does not contain the key `instrument_name_sql` which is required. Update json file. ")
     
-    # parse other instrument level parameters, besides `instrument_name_loris`
+    # parse other instrument level parameters, besides `instrument_name_sql`
     for inst_param in json_keys_instrument_parameters[0:]: 
         if (inst_param in instrument_information.keys()): 
             instrument_parameters[inst_param] = instrument_information[inst_param]
@@ -123,17 +123,17 @@ def convert_instrument_template(instrument_information, **kwargs):
                     tmp_g["group_fields_keys"] = [
                         {
                             "key": key, 
-                            "field": value["field_name_loris"],
-                            "label": value.get("field_front_text_php", value["field_name_loris"]),
-                            "type": [x for x in [k if (value["field_type_loris"] in v) else None for k,v in field_type.items()] if x is not None][0],
+                            "field": value["field_name_sql"],
+                            "label": value.get("field_front_text_php", value["field_name_sql"]),
+                            "type": [x for x in [k if (value["field_type_sql"] in v) else None for k,v in field_type.items()] if x is not None][0],
                             # TODO: add these parameters to template
                             # "attributes": None, 
-                            "options": "array(" + ",".join([f'"{key1}" => "{key2}"' for key1, key2 in zip(value["enum_values_loris"], value.get("enum_values_php", value["enum_values_loris"])) ]) + ")" if value["field_type_loris"] == "enum" else False, 
+                            "options": "array(" + ",".join([f'"{key1}" => "{key2}"' for key1, key2 in zip(value["enum_values_sql"], value.get("enum_values_php", value["enum_values_sql"])) ]) + ")" if value["field_type_sql"] == "enum" else False, 
                                 # } 
                             # "customs": None 
-                        }  for key, value in instrument_information["fields"].items() if value["field_name_loris"] in instrument_information["groups"][g]["group_fields"]] 
+                        }  for key, value in instrument_information["fields"].items() if value["field_name_sql"] in instrument_information["groups"][g]["group_fields"]] 
                     # grab php text for the keys
-                    # tmp_g["group_fields_text"] = [value.get("field_front_text_php", value["field_name_loris"]) for key, value in instrument_information["fields"].items() if value["field_name_loris"] in instrument_information["groups"][g]["group_fields"]] 
+                    # tmp_g["group_fields_text"] = [value.get("field_front_text_php", value["field_name_sql"]) for key, value in instrument_information["fields"].items() if value["field_name_sql"] in instrument_information["groups"][g]["group_fields"]] 
                 elif param in instrument_information["groups"][g].keys(): 
                     # add the parameter to the group dict entry
                     tmp_g[param] = instrument_information["groups"][g][param]
@@ -156,51 +156,51 @@ def convert_instrument_template(instrument_information, **kwargs):
         for q in instrument_information["fields"].keys(): 
             tmp_q = {}
             # if isinstance(json_keys_field_parameters, (bool)): 
-            #     print(f'error with q: {instrument_information["fields"][q]["field_name_loris"]} and json_keys_field_parameters: {json_keys_field_parameters}')
+            #     print(f'error with q: {instrument_information["fields"][q]["field_name_sql"]} and json_keys_field_parameters: {json_keys_field_parameters}')
             for param in json_keys_field_parameters: 
-                # ["field_name_loris", "field_front_text_php", "field_type_loris", 
-                # "enum_values_loris", "enum_values_php", "field_include_not_answered", 
+                # ["field_name_sql", "field_front_text_php", "field_type_sql", 
+                # "enum_values_sql", "enum_values_php", "field_include_not_answered", 
                 # "field_default_value", "associated_status_field", "page_php", 
                 # "hidden_on_php", "group_php", "rule_php", "note_php"]
                 # print(f'question {q} is type {type(instrument_information["fields"][q])}')
                 if (param in instrument_information["fields"][q].keys()): 
                     # ------------------------------- format enums ------------------------------- #
-                    if param == "enum_values_loris" and instrument_information["fields"][q]["field_type_loris"] == "enum":
+                    if param == "enum_values_sql" and instrument_information["fields"][q]["field_type_sql"] == "enum":
                         # IF we do not have enum fields provided
-                        if not bool(instrument_information["fields"][q]["enum_values_loris"]): 
-                            fields_warnings[f'{q}'] = "Question listed as enum, but no enum_values_loris provided."
-                        # or IF we have enum_values_loris and enum_values_php 
-                        elif bool(instrument_information["fields"][q]["enum_values_loris"]) and bool(instrument_information["fields"][q].get("enum_values_php", [])): 
-                        #    confirm that enum_values_php is the same length as enum_values_loris
-                           if len(instrument_information["fields"][q].get("enum_values_php", [])) != len(instrument_information["fields"][q]["enum_values_loris"]): 
-                               fields_warnings[f'{q}'] = "Length of enum_values_loris does not equal enum_values_php. Did not apply enum_values_php to template"
-                               tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_loris"]]) + ")"
+                        if not bool(instrument_information["fields"][q]["enum_values_sql"]): 
+                            fields_warnings[f'{q}'] = "Question listed as enum, but no enum_values_sql provided."
+                        # or IF we have enum_values_sql and enum_values_php 
+                        elif bool(instrument_information["fields"][q]["enum_values_sql"]) and bool(instrument_information["fields"][q].get("enum_values_php", [])): 
+                        #    confirm that enum_values_php is the same length as enum_values_sql
+                           if len(instrument_information["fields"][q].get("enum_values_php", [])) != len(instrument_information["fields"][q]["enum_values_sql"]): 
+                               fields_warnings[f'{q}'] = "Length of enum_values_sql does not equal enum_values_php. Did not apply enum_values_php to template"
+                               tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_sql"]]) + ")"
                            else: 
-                               tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}" => "{key2}"' for key1, key2 in zip(instrument_information["fields"][q]["enum_values_loris"], instrument_information["fields"][q]["enum_values_php"])]) + ")"
-                        # otherwise we have enum_values_loris, and just save those values
+                               tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}" => "{key2}"' for key1, key2 in zip(instrument_information["fields"][q]["enum_values_sql"], instrument_information["fields"][q]["enum_values_php"])]) + ")"
+                        # otherwise we have enum_values_sql, and just save those values
                         else:
-                            tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_loris"]]) + ")"
+                            tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_sql"]]) + ")"
                     # if param == "enum_values_php": 
                     #     # if enum_values_php is not empty, and the list of enums does not match, raise error
-                    #     if bool(instrument_information["fields"][q]["enum_values_php"]) and len(instrument_information["fields"][q].get("enum_values_loris", [])) != len(instrument_information["fields"][q]["enum_values_php"]): 
-                    #         fields_warnings[f'{q}'] = "Length of enum_values_loris does not equal enum_values_php. Did not apply enum_values_php to template"
-                    #         print(f"\tQuestion {q}: Length of enum_values_loris does not equal enum_values_php. Did not apply enum_values_php to template")
-                    #         tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_loris"]]) + ")"
+                    #     if bool(instrument_information["fields"][q]["enum_values_php"]) and len(instrument_information["fields"][q].get("enum_values_sql", [])) != len(instrument_information["fields"][q]["enum_values_php"]): 
+                    #         fields_warnings[f'{q}'] = "Length of enum_values_sql does not equal enum_values_php. Did not apply enum_values_php to template"
+                    #         print(f"\tQuestion {q}: Length of enum_values_sql does not equal enum_values_php. Did not apply enum_values_php to template")
+                    #         tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_sql"]]) + ")"
                     #     # OR, enum_values_php may just be an empty array or false
                     #     elif not bool(instrument_information["fields"][q]["enum_values_php"]):
-                    #         print(f"\tQuestion {q}: DOES NOT have enum_values_php, so save just the enum_values_loris values")
-                    #         tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_loris"]]) + ")"
+                    #         print(f"\tQuestion {q}: DOES NOT have enum_values_php, so save just the enum_values_sql values")
+                    #         tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_sql"]]) + ")"
                     #     # otherwise we zip the two list together for php
                     #     else: 
-                    #         print(f"\tQuestion {q}: zip/map values from enum_values_loris and enum_values_php.")
-                    #         tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}" => "{key2}"' for key1, key2 in zip(instrument_information["fields"][q]["enum_values_loris"], instrument_information["fields"][q].get("enum_values_php", instrument_information["fields"][q]["enum_values_loris"])) ]) + ")" if instrument_information["fields"][q]["field_type_loris"] == "enum" else False
-                    # elif (instrument_information["fields"][q]["field_type_loris"] == "enum") and (param == "enum_values_loris") and ("enum_array" not in tmp_q.keys()): 
-                    #     tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_loris"]]) + ")"
+                    #         print(f"\tQuestion {q}: zip/map values from enum_values_sql and enum_values_php.")
+                    #         tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}" => "{key2}"' for key1, key2 in zip(instrument_information["fields"][q]["enum_values_sql"], instrument_information["fields"][q].get("enum_values_php", instrument_information["fields"][q]["enum_values_sql"])) ]) + ")" if instrument_information["fields"][q]["field_type_sql"] == "enum" else False
+                    # elif (instrument_information["fields"][q]["field_type_sql"] == "enum") and (param == "enum_values_sql") and ("enum_array" not in tmp_q.keys()): 
+                    #     tmp_q["enum_array"] = "array(" + ",".join([f'"{key1}"' for key1 in instrument_information["fields"][q]["enum_values_sql"]]) + ")"
                     # ----------------------------- format XIN Rules ----------------------------- #
                     if param == "rule_php" and bool(instrument_information["fields"][q]["rule_php"]):
                         # TODO: test this works, and add error IO handling
                         tmp_q["XINRegisterRule"] = {
-                            "field_name": instrument_information["fields"][q]["field_name_loris"], 
+                            "field_name": instrument_information["fields"][q]["field_name_sql"], 
                             "rule": instrument_information["fields"][q]["rule_php"]["rule"] if ("rule" in instrument_information["fields"][q]["rule_php"].keys()) else False, 
                             "required": instrument_information["fields"][q]["rule_php"]["required"] if ("required" in instrument_information["fields"][q]["rule_php"].keys()) else False, 
                             "message": instrument_information["fields"][q]["rule_php"]["message"] if ("message" in instrument_information["fields"][q]["rule_php"].keys()) else False,
