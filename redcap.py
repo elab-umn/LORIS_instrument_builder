@@ -155,11 +155,13 @@ def make_enum_array(question):
         options_php = []
         options_sql = []
         if field_type == 'yesno':
-            options_sql = [ '0', '1' ]
-            options_php = ['No', 'Yes']
+            options_sql = [ '', '0', '1' ]
+            options_php = [ '', 'No', 'Yes']
         else:
-            options_sql = [option.split(',')[0] for option in options.split('|')]
-            options_php = [option.split(',')[1] for option in options.split('|')]
+            options_sql = [option.split(',')[0].strip() for option in options.split('|')]
+            options_sql.insert(0, "")
+            options_php = [option.split(',')[1].strip() for option in options.split('|')]
+            options_php.insert(0, "")
 
         return options_sql, options_php
     else:
@@ -201,7 +203,8 @@ def metadata_to_instrument_json(metadata, form):
                 "hidden_on_php": False,
                 "group_php": False,
                 "rule_php": False,
-                "note_php": False
+                "note_php": False,
+                "metadata_fields": False
             } for index, field in enumerate(instrument.values())
         },
         "groups": {}
