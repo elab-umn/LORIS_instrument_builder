@@ -1,9 +1,10 @@
 import requests
 import json
-from redcap_config import token, api_route
+import configparser
 import pandas as pd
+import os
 
-def get_metadata():
+def get_metadata(redcap_config = os.path.join('config','redcap_config.ini'), db = 'redcap'):
     '''
     Gets REDCap metadata from the API. See get_data
 
@@ -12,6 +13,26 @@ def get_metadata():
     result: dictionary
         metadata from the REDCap API call
     '''
+
+    # Read config file for database connections
+    config = configparser.ConfigParser()
+    try:
+        with open(redcap_config) as f:
+            config.read_file(f)
+    except IOError:
+        raise FileNotFoundError(
+            "database config file ({dbconfig}) not found. Check script directory or path to {dbconfig}"
+        )
+
+    # check config information is available, and connect to the databse selected
+    if config.has_section(db):
+        token = config.get(db, "token")
+        api_route = config.get(db, "api_route")
+
+    else:
+        # failsafe is config doesn't have expecated connection information
+        raise RuntimeError("CONFIG ERROR -- Something went wrong. DB connection not found in {dbconfig} file.")    
+
     data = {
         'token': f'{token}',
         'content': 'metadata',
@@ -134,11 +155,13 @@ def make_enum_array(question):
         options_php = []
         options_sql = []
         if field_type == 'yesno':
-            options_sql = [ '0', '1' ]
-            options_php = ['No', 'Yes']
+            options_sql = [ '', '0', '1' ]
+            options_php = [ '', 'No', 'Yes']
         else:
-            options_sql = [option.split(',')[0] for option in options.split('|')]
-            options_php = [option.split(',')[1] for option in options.split('|')]
+            options_sql = [option.split(',')[0].strip() for option in options.split('|')]
+            options_sql.insert(0, "")
+            options_php = [option.split(',')[1].strip() for option in options.split('|')]
+            options_php.insert(0, "")
 
         return options_sql, options_php
     else:
@@ -164,14 +187,14 @@ def metadata_to_instrument_json(metadata, form):
 
     instrument_data = {
         "instrument_name": form,
-        "instrument_name_loris": form,
+        "instrument_name_sql": form,
         "pages": {},
         "fields": {
             f"field{index + 1}": { 
-                "field_name_loris": field["field_name"],
+                "field_name_sql": field["field_name"],
                 "field_front_text_php": field["field_label"],
-                "field_type_loris": field_type_lookup(field),
-                "enum_values_loris": make_enum_array(field)[0],
+                "field_type_sql": field_type_lookup(field),
+                "enum_values_sql": make_enum_array(field)[0],
                 "enum_values_php": make_enum_array(field)[1],
                 "field_include_not_answered": False,
                 "field_default_value": False,
@@ -180,7 +203,8 @@ def metadata_to_instrument_json(metadata, form):
                 "hidden_on_php": False,
                 "group_php": False,
                 "rule_php": False,
-                "note_php": False
+                "note_php": False,
+                "metadata_fields": False
             } for index, field in enumerate(instrument.values())
         },
         "groups": {}

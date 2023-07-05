@@ -142,6 +142,3 @@ dmypy.json
 
 # Ignore outputs
 outputs/
-
-# config
-redcap_config.py

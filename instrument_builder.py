@@ -4,7 +4,7 @@ import argparse
 import os
 import json
 
-from validate import valid_readable_file, DataSource, Directory, valid_config_parameter
+from validate import valid_readable_file, DataSource, Directory, valid_config_parameter, instrument_json, directory
 from generate_instrument import generate_instrument_from_template
 from redcap import all_metadata_to_instrument_jsons
 from qualtrics import get_metadata_from_survey
@@ -12,10 +12,10 @@ from qualtrics import get_metadata_from_survey
 def main():
     args = parse_args()
     path = args.path
-    source = args.source.__str__()
+    source = args.source
 
     # Make output directories
-    output_dir = args.output_dir.directory
+    output_dir = args.output_dir
     if not os.path.exists(os.path.join(output_dir, "php")):
         os.makedirs(os.path.join(output_dir, "php"))
     if not os.path.exists(os.path.join(output_dir, "sql")):
@@ -59,18 +59,18 @@ def parse_args():
         "-o", "--output_dir",
         dest="output_dir",
         default="outputs",
-        type=Directory,
+        type=Directory, #FIXME: should this be "directory" from validate? probably not? 
         help="Valid file path to output directory."
     )
     parser.add_argument(
         "--path",
-        type=valid_readable_file,
+        type=instrument_json,
         help=("Valid path to instrument details json file. "
               "See EXAMPLE_instrument_details.json")
     )
     parser.add_argument(
         "--source",
-        type=DataSource,
+        type=DataSource, #FIXME: should this be choices? probably not? 
         help="A supported data source."
     )
     parser.add_argument(
@@ -89,13 +89,16 @@ def parse_args():
         "--survey",
         type=str,
         default=None,
-        help="String of survey to generate. If using config files, string should match the option label in the 'config/qualtrics_survey_import_config.ini' configuration file. If specifying a single survey, this should be the full survey ID."
+        help=("String of survey to generate. "
+              "If using config files, string should match the option label in the 'config/qualtrics_survey_import_config.ini' configuration file. " 
+              "If specifying a single survey, this should be the full survey ID.")
     )
     parser.add_argument(
         "--project",
         type=str,
         default=None,
-        help="String of project name. Should match the section in the 'config/redcap_config.ini' or 'config/qualtrics_config.ini' configuration file."
+        help=("String of project name. "
+              "Should match the section in the 'config/redcap_config.ini' or 'config/qualtrics_config.ini' configuration file.")
     )
     return parser.parse_args()
 
