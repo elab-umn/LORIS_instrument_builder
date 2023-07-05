@@ -1,5 +1,6 @@
 import os
 import argparse
+import configparser
 
 def valid_readable_file(path):
     # https://github.com/DCAN-Labs/CABINET/blob/main/src/utilities.py
@@ -32,6 +33,22 @@ def validate(to_validate, is_real, make_valid, err_msg, prepare=None):
     except (OSError, TypeError, AssertionError, ValueError,
             argparse.ArgumentTypeError):
         raise argparse.ArgumentTypeError(err_msg.format(to_validate))
+
+def valid_config_parameter(config_file, section, parameter):
+    config = configparser.ConfigParser()
+    try:
+        with open(config_file) as f:
+            config.read_file(f)
+    except IOError:
+        raise FileNotFoundError(
+            f"Config file ({config_file}) not found. Add or rename file so {config_file} exists in directory."
+        )
+
+    # check config information is available, and connect to the databse selected
+    if config.has_option(section, parameter):
+        return config.get(section, parameter)
+    else: 
+        raise NameError(f"Parameter {parameter} does not exist in section {section} in the config file {config_file}")
 
 class Directory:
     def __init__(self, directory):

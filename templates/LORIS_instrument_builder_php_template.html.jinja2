@@ -311,36 +311,36 @@ class NDB_BVL_Instrument_{{ instrument.sql_table_name }} extends NDB_BVL_Instrum
                 {% endfor %}
                 {% set ns.groupsadded = ns.groupsadded ~ "|" ~ fields[q]["group_php"] %}
             {% endif %}
-        {% elif fields[q]["field_type_loris"] in field_type.text%}
+        {% elif fields[q]["field_type_sql"] in field_type.text%}
             {% if fields[q]["associated_status_field"] %}
-        $this->addTextElement('{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+        $this->addTextElement('{{ fields[q]["field_name_sql"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
             {% else %}
-        $this->form->addElement('text','{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+        $this->form->addElement('text','{{ fields[q]["field_name_sql"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
             {% endif %}
-        {% elif fields[q]["field_type_loris"] in field_type.textarea %}
-        $this->addTextAreaElement('{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
-        {% elif fields[q]["field_type_loris"] == 'enum' %}
-        $this->form->addElement('select', '{{ fields[q]["field_name_loris"] }}', "{{ fields[q]["field_front_text_php"]|e }}", {{ fields[q]["enum_array"] }} );
-        {% elif fields[q]["field_type_loris"] == 'date' %}
-        $this->addBasicDate('{{ fields[q]["field_name_loris"] }}', "{{ fields[q]["field_front_text_php"]|e }}");
-        {% elif fields[q]["field_type_loris"] == 'header' %}
+        {% elif fields[q]["field_type_sql"] in field_type.textarea %}
+        $this->addTextAreaElement('{{ fields[q]["field_name_sql"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+        {% elif fields[q]["field_type_sql"] == 'enum' %}
+        $this->form->addElement('select', '{{ fields[q]["field_name_sql"] }}', "{{ fields[q]["field_front_text_php"]|e }}", {{ fields[q]["enum_array"] }} );
+        {% elif fields[q]["field_type_sql"] == 'date' %}
+        $this->addBasicDate('{{ fields[q]["field_name_sql"] }}', "{{ fields[q]["field_front_text_php"]|e }}");
+        {% elif fields[q]["field_type_sql"] == 'header' %}
         $this->addHeader("{{ fields[q]["field_front_text_php"] }}");
-        {% elif fields[q]["field_type_loris"] == 'static' %}
+        {% elif fields[q]["field_type_sql"] == 'static' %}
         $this->form->addElement('static','',"{{ fields[q]["field_front_text_php"]|e }}");
-        {% elif fields[q]["field_type_loris"] == 'br' or fields[q]["field_type_loris"] == 'break' %}
+        {% elif fields[q]["field_type_sql"] == 'br' or fields[q]["field_type_sql"] == 'break' %}
         $this->form->addElement('static','',"<br/>");
-        {% elif fields[q]["field_type_loris"] == 'score' %}
-        $this->form->addElement('static','{{ fields[q]["field_name_loris"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
+        {% elif fields[q]["field_type_sql"] == 'score' %}
+        $this->form->addElement('static','{{ fields[q]["field_name_sql"] }}',"{{ fields[q]["field_front_text_php"]|e }}");
         {% endif %}
         {% if (fields[q]["rules_php"] is defined) and (fields[q]["rules_php"] != false) %}
         $this->form->XINRegisterRule( 
-            {{ fields[q]["field_type_loris"] }}, 
-            array( {% if fields[q]["XINResgisterRule"]["rule"] is defined %} {{ fields[q]["XINResgisterRule"]["rule"] }} {% else %} {{ fields[q]["field_type_loris"] ~ "{@}={@}NEVER_REQUIRED"}} {% endif %}  ), 
+            {{ fields[q]["field_type_sql"] }}, 
+            array( {% if fields[q]["XINResgisterRule"]["rule"] is defined %} {{ fields[q]["XINResgisterRule"]["rule"] }} {% else %} {{ fields[q]["field_type_sql"] ~ "{@}={@}NEVER_REQUIRED"}} {% endif %}  ), 
             {% if fields[q]["XINResgisterRule"]["message"] is defined %} {{ fields[q]["XINResgisterRule"]["message"] }} {% elif fields[q]["XINResgisterRule"]["required"] == true %} "Required" {% else %} "Not required..."  {% endif %} 
             {% if fields[q]["XINResgisterRule"]["rule"] is defined %} {{ ", " ~ fields[q]["XINResgisterRule"]["group"] }} {% else %} "" {% endif %} )
         {% endif %}
         {# ADD any php notes to be included for question field #}
-        {% if fields[q]["note_php"]%}            /* NOTE: {{ fields[q]["field_name_loris"] }} {{ fields[q]["note_php"] }} */
+        {% if fields[q]["note_php"]%}            /* NOTE: {{ fields[q]["field_name_sql"] }} {{ fields[q]["note_php"] }} */
         {% endif %}
     {% endif %}
     {% endfor %}
