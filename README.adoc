@@ -4,12 +4,36 @@ Python scripts to configure and build instruments in LORIS
 
 This repository has a number of scripts and classes that are useful to automatically building instruments for LORIS. In general, it is essential to know which data will be stored in the SQL, which data will be displayed in the PHP instrument, and the mapping between the datatypes in SQL and PHP.
 
+== Steps to build an instrument with the LORIS_instrument_builder
+. Compile information about surveys you wish to build. This may come in different formats:
+** (1) Manually create a `.json` file that outlines the fields in the SQL table, linking SQL fields to specific data types and external field names and specifying how data will appear in PHP. 
+** (2) Set of surveys collected in Redcap. [big red]#FIXME: ADD DETAILS ABOUT WHAT IS NEEDED FOR REDCAP#
+** (3) Set of surveys collected in Qualtrics. You will need your qualtrics API key, datacenter, and survey IDs. 
+. Run script for set of surveys to create. 
+. Verify output. Edit `.json` files if necessary, and rerun script on the modified `.json` files
+. Build tables and add necessary lines to SQL database. This can be run directly from the SQL scripts the script produces. 
+. Add PHP files to instruments on LORIS instance. 
+
+// . Build a `.json` file outlining the fields in the SQL table. The `.json` file also links these SQL fields with how the data will appear in PHP. 
+// .. There are a few automated processes pulling data from Redcap and Qualtrics surveys. These are designed to quickly build instruments from existing data collection.  
+// . Using the `generate_instrument_from_template` function, process the `<instrument_name>_instrument_details.json` files to 
+// ** (1) generate SQL scripts to build instrument tables and 
+// ** (2) generate PHP instrument files to add to `<loris_instance>/project/instruments/` directory. 
+// . Optionally, you can connect these scripts directly to your instance of LORIS through the MySQL APIs using `mysql.connector`. Doing so, the scripts generated from 
+
 == Running the script
 
-From the LORIS_INSTRUMENT_BUILDER directory run `./instrument_builder.py`.
+From the LORIS_INSTRUMENT_BUILDER directory run `./instrument_builder.py`. 
 Must include either `--path` or `--source` flag.
+The most common uses are as follows: 
 
-=== Flags
+generate from instrument_details.json file:: `./instrument_builder.py --path examples/EXAMPLE_instrument_details.json`
+generate from redcap:: `./instrument_builder.py --source redcap`
+generate from qualtrics:: `./instrument_builder.py --source qualtrics --project study1 --survey id_survey2` + 
+from config files or with specific IDs + 
+`./instrument_builder.py --source qualtrics --apitoken 0GsPO37HcxB1Vlaznc --datacenter ca1 --survey SV_OvygXolCODKL`
+
+=== Description of Flags
 
 |===
 |flag |Required |Description |Example
@@ -54,16 +78,11 @@ Currently implemented sources: `redcap` and `qualtrics`
 
 |===
 
-.Steps to build an instrument with the LORIS_instrument_builder
-. Build a `.json` file outlining the fields in the SQL table. The `.json` file also links these SQL fields with how the data will appear in PHP. 
-.. There are a few automated processes pulling data from Redcap and Qualtrics surveys. These are designed to quickly build instruments from existing data collection.  
-. Using the `generate_instrument_from_template` function, process the `<instrument_name>_instrument_details.json` files to 
-** (1) generate SQL scripts to build instrument tables and 
-** (2) generate PHP instrument files to add to `<loris_instance>/project/instruments/` directory. 
-. Optionally, you can connect these scripts directly to your instance of LORIS through the MySQL APIs using `mysql.connector`. Doing so, the scripts generated from 
+== Script example outputs
 
+Outputs will be saved by default in `outputs/` and separated into `json`, `php`, and `sql` folders. The `json` folder includes the input file/template file used to create all of the outputs. This file can be shared to generate files and tables needed to build an instrument in loris. This is where template files should be edited when updating the outputs generated from the instrument builder. The `php` folder generated the php instrument files used for the front end of LORIS. This will specify how the data in the database is presented and can be manipulated from the front-end user. The `sql` folder contains typically three sql scripts to build the instrument: _instrument_CREATE_, which builds the instrument table, _test_names_INSERT_, which adds the instrument to the `test_names` table, and _instrument_subtests_INSERT_, which adds the subtests or pages to the `instrument_subtests` table. 
 
-== Formatting the <instrument_name>_instrument_details.json file
+== Formatting an <instrument_name>_instrument_details.json file
 
 This is a basic json file that contains all of the information to generate an instrument in LORIS. 
 
