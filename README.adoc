@@ -7,19 +7,52 @@ This repository has a number of scripts and classes that are useful to automatic
 == Running the script
 
 From the LORIS_INSTRUMENT_BUILDER directory run `./instrument_builder.py`.
-Must include either path or source flag.
+Must include either `--path` or `--source` flag.
 
 === Flags
-. --path
-** path to an instrument details JSON file
-** Example command: `./instrument_builder.py --path examples/EXAMPLE_instrument_details.json`
-. --source
-** database to pull metadata from. Creates an instrument for each instrument in the source.
-** currently implemented sources: `redcap`
-** Example command: `./instrument_builder.py --source redcap`
-. --output_dir, -o
-** optional path to an output directory. Defaults to `outputs`
-** creates the directory if it does not already exist.
+
+|===
+|flag |Required |Description |Example
+
+| `--output_dir`, `-o`
+| _Optional_, default is "outputs/"
+| optional path to an output directory. Defaults to `outputs` creates the directory if it does not already exist.
+| 
+
+|`--path` 
+| _Optional_ +
+[red]#Required# if generating instrument from json file. 
+|path to an instrument details JSON file
+|`./instrument_builder.py --path examples/EXAMPLE_instrument_details.json`
+
+|`--source`
+| _Optional_ +
+[red]#Required# if generating instrument from external source, not in instrument template. 
+|database to pull metadata from. Creates an instrument for each instrument in the source.+
+Currently implemented sources: `redcap` and `qualtrics`
+| `./instrument_builder.py --source redcap`
+
+|`--apitoken`
+|_Optional_
+|String of API access token. Should be specified when using `--datacenter` and `--survey` flags
+|`./instrument_builder.py --source qualtrics --apitoken 0GsPO37HcxB1Vlaznc --datacenter ca1 --survey SV_OvygXolCODKL`
+
+|`--datacenter`
+|_Optional_
+|String of datacenter for qualtrics account. Should be specified when using `--apitoken` and `--survey` flags
+|`./instrument_builder.py --source qualtrics --apitoken 0GsPO37HcxB1Vlaznc --datacenter ca1 --survey SV_OvygXolCODKL`
+
+|`--survey`
+|_Optional_
+|String of survey to generate. If using config files, string should match the option label in the 'config/qualtrics_survey_import_config.ini' configuration file. If specifying a single survey, this should be the full survey ID."
+|`./instrument_builder.py --source qualtrics --project gates --survey id_cshq`
+
+|`--project`
+|_Optional_
+|String of project name. Should match the section in the 'config/redcap_config.ini' or 'config/qualtrics_config.ini' configuration file.
+|`./instrument_builder.py --source qualtrics --project gates --survey id_cshq`
+
+|===
 
 .Steps to build an instrument with the LORIS_instrument_builder
 . Build a `.json` file outlining the fields in the SQL table. The `.json` file also links these SQL fields with how the data will appear in PHP. 
