@@ -4,7 +4,7 @@ import argparse
 import os
 import json
 
-from validate import valid_readable_file, DataSource, Directory, valid_config_parameter, instrument_json, directory
+from validate import valid_readable_file, valid_config_parameter, instrument_json, directory
 from generate_instrument import generate_instrument_from_template
 from redcap import all_metadata_to_instrument_jsons
 from qualtrics import get_metadata_from_survey
@@ -59,7 +59,7 @@ def parse_args():
         "-o", "--output_dir",
         dest="output_dir",
         default="outputs",
-        type=Directory, #FIXME: should this be "directory" from validate? probably not? 
+        type=directory,
         help="Valid file path to output directory."
     )
     parser.add_argument(
@@ -70,7 +70,7 @@ def parse_args():
     )
     parser.add_argument(
         "--source",
-        type=DataSource, #FIXME: should this be choices? probably not? 
+        choices=["redcap", "qualtrics"],
         help="A supported data source."
     )
     parser.add_argument(

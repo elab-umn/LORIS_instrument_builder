@@ -109,22 +109,3 @@ def valid_config_parameter(config_file, section, parameter):
         return config.get(section, parameter)
     else: 
         raise NameError(f"Parameter {parameter} does not exist in section {section} in the config file {config_file}")
-
-class Directory:
-    def __init__(self, directory):
-        if not os.path.isdir(directory):
-            os.makedirs(directory)
-        self.directory = directory
-    
-    def __str__(self) -> str:
-        return self.directory
-
-class DataSource:
-    def __init__(self, source):
-        valid_sources = ["redcap", "qualtrics"]
-        if source in valid_sources:
-            self.source = source
-        else:
-            raise argparse.ArgumentTypeError("{} is not a valid datasource. Please choose from {}".format(source, valid_sources))
-    def __str__(self) -> str:
-        return self.source
