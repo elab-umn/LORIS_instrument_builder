@@ -360,81 +360,20 @@ def get_qualtrics_survey_definition(token, datacenter, surveyid):
 
     return response
 
+def get_qualtrics_survey_responses(token, datacenter, surveyid):
+    baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}/export-responses/".format(datacenter, surveyid)
+    headers = {"content-type": "application/json", "x-api-token": token}
 
-# def pull_questions_from_survey_definition(surveydefinitionresponse):
-#     '''Uses response from get_survey_definition to pull qualtrics survey information'''
-#     htmlcleaner = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
-#     survey_details = {
-#         "Survey Name": surveydefinitionresponse['result']['SurveyName'],
-#         "Survey Status": surveydefinitionresponse['result']['SurveyStatus'],
-#         "Question Count": surveydefinitionresponse['result']['QuestionCount'],
-#         "Question List": list(surveydefinitionresponse['result']['Questions'].keys()),
-#         "Question Tag": dict((surveydefinitionresponse['result']['Questions'][q]['QuestionID'],re.sub(htmlcleaner, '', surveydefinitionresponse['result']['Questions'][q]['DataExportTag'])) for q in surveydefinitionresponse['result']['Questions']),
-#         "Question Text": dict((surveydefinitionresponse['result']['Questions'][q]['QuestionID'],re.sub(htmlcleaner, '', surveydefinitionresponse['result']['Questions'][q]['QuestionText'])) for q in surveydefinitionresponse['result']['Questions']),
-#         "Question Type": dict((surveydefinitionresponse['result']['Questions'][q]['QuestionID'],surveydefinitionresponse['result']['Questions'][q]['QuestionType']) for q in surveydefinitionresponse['result']['Questions']),
-#         "Question Answers": dict((surveydefinitionresponse['result']['Questions'][q]['QuestionID'], pull_answers_from_question(surveydefinitionresponse['result']['Questions'][q])) for q in surveydefinitionresponse['result']['Questions'])
-#     }
-#     return survey_details
+    response = qualtrics_api_request("GET", baseUrl, headers).json()
 
-# def pull_answers_from_question(surveyquestion):
-#     '''Pulls answers for qualtrics questions, of different types'''
-#     questiontype = surveyquestion["QuestionType"]
-#     answertype = None
-#     answerchoices = None
-#     answerorder = None
+    # we check if the response is okay, and if it is not, we raise the RuntimeError
+    if re.search(pattern="^200\s", string=response["meta"]["httpStatus"]) is None:
+        raise RuntimeError(
+            f"API request failed: {response['meta']['httpStatus']}, {response['meta']['error']['errorMessage']}"
+        )
+    # TODO: check to make sure this works
 
-#     if questiontype == "TE": # text entry
-#         answertype = "text"
-#         answerchoices = "NULL"
-#         answerorder = "NULL"
-#     elif questiontype == "MC": # multiple choice
-#         if surveyquestion["Selector"] in ["SAVR", "SAHR", "SACOL", "DL", "SB"]:  #single answer multiple choice questions
-#             # "Single Answer Vertical", "Single Answer Horizontal", "Single Answer Column", "Dropdown List", "Select Box"
-#             answertype = "single"
-#             answerchoices = {i:surveyquestion["Choices"][i]["Display"] for i in surveyquestion["Choices"].keys()}
-#             answerorder = surveyquestion["ChoiceOrder"]
-#             # {i:t1['result']['Questions']["QID1713868340"]["Choices"][i]["Display"] for i in t1['result']['Questions']["QID1713868340"]["Choices"].keys()}
-#         elif surveyquestion["Selector"] in ["MACOL"]: #assuming multiple answers...
-#             answertype = "multiple"
-#             answerchoices = {i:surveyquestion["Choices"][i]["Display"] for i in surveyquestion["Choices"].keys()}
-#             answerorder = surveyquestion["ChoiceOrder"]
-#     elif questiontype == "DB": # descriptive box
-#         answertype = "DB-not_implemented"
-#     elif questiontype == "Matrix": # matrix
-#         answertype = "subquestions"
-#         subquestionlist = [f'{surveyquestion["QuestionID"]}_{i}' for i in surveyquestion["ChoiceOrder"]]
-#         subquestiontext = {f'{surveyquestion["QuestionID"]}_{i}':surveyquestion["Choices"][i]["Display"] for i in surveyquestion["ChoiceOrder"]}
-#         answerchoices = {x:surveyquestion["Answers"][x]["Display"] for x in surveyquestion["Answers"].keys()}
-#         answerorder = surveyquestion["AnswerOrder"]
-#     elif questiontype == "SBS": # side-by-side
-#         answertype = "subquestions"
-#         subquestionlist = []
-#         subquestiontext = []
-#         answerchoices = {}
-#         answerorder = []
-#         for n in surveyquestion["AdditionalQuestions"].keys():
-#             for i in surveyquestion["AdditionalQuestions"][n]["Choices"].keys():
-#                 subquestionlist.append(f'{surveyquestion["AdditionalQuestions"][n]["QuestionID"]}_{i}') #add a column for each subquestion
-#                 subquestiontext.append(f'{surveyquestion["AdditionalQuestions"][n]["QuestionID"]}_{i}')
-#                 answerchoices[f'{surveyquestion["QuestionID"]}#{n}_{i}'] = {x:surveyquestion["AdditionalQuestions"][n]["Answers"][x]["Display"] for x in surveyquestion["AdditionalQuestions"][n]["Answers"].keys() }
-#                 answerorder.append(surveyquestion["AdditionalQuestions"][n]["Answers"].keys())
-#         # answerchoices = [f"{surveyquestion["QuestionID"]}#{n}_{i}":]
-#         # print('')
-#     elif questiontype == "DD": #drop down
-#         answertype = "DD-not_implemented"
-#     return {"AnswerType": answertype, "AnswerChoices": answerchoices, "AnswerOrder": answerorder}
-
-
-# def get_metadata():
-#     """
-#     Gets Qualtrics survey metadata from the API. See get_data
-
-#     Returns
-#     ----------
-#     result: dictionary
-#         metadata from the Qualtrics API call
-#     """
-
+    return response
 
 def field_type_lookup(question):
     """
@@ -472,54 +411,6 @@ def field_type_lookup(question):
     }
     field_type = field_type_lookup[question["QuestionType"]]
     return field_type
-
-
-# def metadata_to_instrument_json(metadata, form):
-#     """
-#     parses a single form's metadata and transforms it into the format accepted by the instrument builder.
-
-#     Arguments
-#     ----------
-#     metadata: dictionary
-#         a dictionary where the keys are instrument names and values are field and their metadata
-#     form: string
-#         the name of a REDCap form
-
-#     Returns
-#     ----------
-#     instrument_data: dictionary
-#         a dictionary that is accepted by the instrument builder
-#     """
-#     instrument = metadata[form]
-
-#     instrument_data = {
-#         "instrument_name": form,
-#         "instrument_name_loris": form,
-#         "pages": {},
-#         "fields": {
-#             f"field{index + 1}": {
-#                 "field_name_loris": field["field_name"],
-#                 "field_front_text_php": field["field_label"],
-#                 "field_type_loris": field_type_lookup(field),
-#                 "enum_values_loris": make_enum_array(field)[0],
-#                 "enum_values_php": make_enum_array(field)[1],
-#                 "field_include_not_answered": False,
-#                 "field_default_value": False,
-#                 "associated_status_field": False,
-#                 "page_php": 0,
-#                 "hidden_on_php": False,
-#                 "group_php": False,
-#                 "rule_php": False,
-#                 "note_php": False,
-#             }
-#             for index, field in enumerate(instrument.values())
-#         },
-#         "groups": {},
-#     }
-
-#     # print(json.dumps(instrument_data, indent=4))
-#     return instrument_data
-
 
 def make_enum_array(question):
     """
@@ -575,28 +466,6 @@ def main():
         print(out)
 
 
-#     # Make output directories
-#     output_dir = args.output_dir.directory
-#     if not os.path.exists(os.path.join(output_dir, "php")):
-#         os.makedirs(os.path.join(output_dir, "php"))
-#     if not os.path.exists(os.path.join(output_dir, "sql")):
-#         os.makedirs(os.path.join(output_dir, "sql"))
-
-#     # Generate instrument(s)
-#     if path:
-#         print(f"Generating instrument from file: {path}")
-#         with open(path) as json_file:
-#             instrument_json = json.load(json_file)
-#         generate_instrument_from_template(instrument_json, output_dir)
-#     elif source:
-#         print(f"Generating instruments from '{source}'")
-#         if source == "redcap":
-#             instruments = all_metadata_to_instrument_jsons()
-#             for instrument in instruments:
-#                 generate_instrument_from_template(instrument, output_dir)
-#     else:
-#         print(f"No inputs defined. Please include --path or --source")
-
 function_map = {
     "survey_definition": get_qualtrics_survey_definition,
     "get_survey_questions": get_questions_from_survey,
@@ -629,11 +498,3 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     main()
-
-
-
-# python3 qualtrics.py --datacenter ca1 -t yhPQuWuY5BpIDRcNpcYmsclJDiv4M5KehA1ude1y --surveyid SV_b8ThCDyxclPJXiS --command survey_definition
-
-
-
-# t1_survey = get_qualtrics_survey_definition("yhPQuWuY5BpIDRcNpcYmsclJDiv4M5KehA1ude1y", "ca1", "SV_b8ThCDyxclPJXiS")
