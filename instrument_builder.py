@@ -20,6 +20,8 @@ def main():
         os.makedirs(os.path.join(output_dir, "php"))
     if not os.path.exists(os.path.join(output_dir, "sql")):
         os.makedirs(os.path.join(output_dir, "sql"))
+    if not os.path.exists(os.path.join(output_dir, "json")):
+        os.makedirs(os.path.join(output_dir, "json"))
 
     # Generate instrument(s)
     if path:
