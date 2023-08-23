@@ -280,7 +280,7 @@ def generate_instrument_from_template(instrument_json, output_dir):
     # read instrument template
     inst = convert_instrument_template(instrument_json)
     # save input json file 
-    with open(os.path.join(output_dir, "json", f"intrument_{inst['instrument']['sql_table_name']}.json"), "w+") as output: 
+    with open(os.path.join(output_dir, "json", f"instrument_{inst['instrument']['sql_table_name']}.json"), "w+") as output: 
         output.write(json.dumps(instrument_json))
     
     # ============================================================================ #
@@ -291,7 +291,7 @@ def generate_instrument_from_template(instrument_json, output_dir):
     with open("templates/LORIS_CREATE_instrument_table_template.sql.jinja2") as filein:  # noqa
         create_table_template = Template(filein.read(), trim_blocks=True, lstrip_blocks=True)
         
-    with open(os.path.join(output_dir, "sql", f"intrument_CREATE_{inst['instrument']['sql_table_name']}.sql"), "w+") as output: 
+    with open(os.path.join(output_dir, "sql", f"instrument_CREATE_{inst['instrument']['sql_table_name']}.sql"), "w+") as output: 
         output.write(create_table_template.render(inst))
     
     # ----------------------- INSERT into test_names table ----------------------- #
