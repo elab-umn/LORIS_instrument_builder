@@ -53,26 +53,33 @@ def main():
         print(f"No inputs defined. Please include --path or --source")
 
 def parse_args():
-    parser = argparse.ArgumentParser("instrument_creator")
+    parser = argparse.ArgumentParser(
+        prog="LORIS Instrument Builder", 
+        description="Scripts that process a set of pre-designed surveys from an external survey platform (qualtrics or redcap) and automatically generate PHP instrument files and SQL script required to implement the survey instrument in the LORIS platform.",
+        usage="python instrument_builder.py --source qualtrics --project study1 --survey id_survey2",
+        epilog="For more information on this tool, visit\n\thttps://github.com/elab-umn/LORIS_instrument_builder for documentation. \nFor more information about LORIS and instrument formats, visit\n\thttps://acesloris.readthedocs.io/en/latest/docs/wiki/01_STUDY_PARAMETERS_SETUP/02_Clinical_Instruments/01_instrument_intro_prerequisites.html"
+    )
 
     parser.add_argument(
+        "--source",
+        choices=["redcap", "qualtrics"],
+        help="A supported data source."
+    )
+    file_input_output = parser.add_argument_group('file_input_output', 'Setting File input/output path')
+    file_input_output.add_argument(
         "-o", "--output_dir",
         dest="output_dir",
         default="outputs",
         type=directory,
         help="Valid file path to output directory."
     )
-    parser.add_argument(
+    file_input_output.add_argument(
         "--path",
         type=instrument_json,
         help=("Valid path to instrument details json file. "
               "See EXAMPLE_instrument_details.json")
     )
-    parser.add_argument(
-        "--source",
-        choices=["redcap", "qualtrics"],
-        help="A supported data source."
-    )
+    qualtrics_parameters = parser.add_argument_group('file_input_output', 'Setting File input/output path')
     parser.add_argument(
         "--apitoken",
         type=str,
