@@ -1,0 +1,10 @@
+INSERT INTO `{{ table_name }}` ({{ columns|join(', ') }})
+VALUES
+{% for _, row in df.iterrows() %}
+    ({% for column in columns %}
+        {% set value = row[column] %}
+        {% if value is none or value == 'NA' or value == '<NA>' or value == 'nan' or value == 'NA' or value == '#N/A' %}NULL{% else %}'{{ value|replace("'", "''")|replace('"', '""') }}'{% endif %}
+        {% if not loop.last %}, {% endif %}
+    {% endfor %})
+    {% if not loop.last %},{% endif %}
+{% endfor %};

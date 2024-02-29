@@ -93,3 +93,22 @@ instrument_name_sql:: The name of the SQL table. Best practice dictates that tab
 metadata_fields::
 validity_enabled::
 validity_required::
+fields::
+groups::
+
+.Fields details
+[horizontal]
+field_name_sql::
+field_front_text_php::
+field_name_external::
+field_type_sql::
+enum_values_sql::
+enum_values_php::
+field_include_not_answered::
+field_default_value::
+associated_status_field::
+page_php::
+hidden_on_php::
+group_php::
+rule_php::
+note_php::

@@ -8,6 +8,7 @@ import json
 # from redcap_config import token, api_route
 # import pandas as pd
 
+
 # ============================================================================ #
 #             for testing and quick access to qualtrics json format            #
 # ============================================================================ #
@@ -20,11 +21,17 @@ def print_json_string(jsonstring, indent=1):
 
 
 def get_question_types(surveydata):
-    return {x: surveydata["result"]["Questions"][x]["QuestionType"] for x in surveydata["result"]["Questions"].keys()}
+    return {
+        x: surveydata["result"]["Questions"][x]["QuestionType"]
+        for x in surveydata["result"]["Questions"].keys()
+    }
 
 
 def get_question_tags(surveydata):
-    return {x: surveydata["result"]["Questions"][x]["DataExportTag"] for x in surveydata["result"]["Questions"].keys()}
+    return {
+        x: surveydata["result"]["Questions"][x]["DataExportTag"]
+        for x in surveydata["result"]["Questions"].keys()
+    }
 
 
 # ============================================================================ #
@@ -36,7 +43,11 @@ htmlcleaner = re.compile("<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});")
 def get_TE_question_data(questiondata):
     # Text Entry question data.
     questionid = questiondata["QuestionID"]
-    questiontag = questiondata["DataExportTag"]
+    questiontag = (
+        questiondata["QuestionID"]
+        if questiondata["DataExportTag"] == ""
+        else questiondata["DataExportTag"]
+    )
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questiontype = questiondata["QuestionType"]
     questionselector = questiondata["Selector"]
@@ -56,13 +67,20 @@ def get_MC_question_data(questiondata):
     # details on MC questions here: https://www.qualtrics.com/support/survey-platform/survey-module/editing-questions/question-types-guide/standard-content/multiple-choice/?parent=p001132
 
     questionid = questiondata["QuestionID"]
-    questiontag = questiondata["DataExportTag"]
+    questiontag = (
+        questiondata["QuestionID"]
+        if questiondata["DataExportTag"] == ""
+        else questiondata["DataExportTag"]
+    )
     questiontype = questiondata["QuestionType"]
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
     questioninfo = {}
     if questiondata["Selector"] == "SAVR" and questiondata["SubSelector"] == "TX":
-        answers = {x: questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
+        answers = {
+            x: questiondata["Choices"][str(x)]["Display"]
+            for x in questiondata["ChoiceOrder"]
+        }
         questioninfo[questionid] = {
             "ID": questionid,
             "Tag": questiontag,
@@ -104,19 +122,30 @@ def get_Matrix_question_data(questiondata):
     # Constant Sum Matrix Table:: For this matrix variation, the downloaded data file will include 1 column for every text box in the matrix table. The columns are labeled according to this numbering scheme: (question number)_(column number)_(row number). In each cell of those columns will be the number that the respondent typed into the constant sum text box.
     # Bipolar Matrix Table:: For this matrix variation, the downloaded data file will include 1 column for each row in the matrix table. In each cell of those columns will be a number that corresponds to 1 of the radio boxes on that particular row. For more information on the numbers attached to radio boxes in a question, visit our recode values page.
     questionid = questiondata["QuestionID"]
-    questiontag = questiondata["DataExportTag"]
+    questiontag = questiontag = (
+        questiondata["QuestionID"]
+        if questiondata["DataExportTag"] == ""
+        else questiondata["DataExportTag"]
+    )
     questiontype = questiondata["QuestionType"]
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
     questioninfo = {}
-    if questiondata["Selector"] == "Likert" and questiondata["SubSelector"] == "SingleAnswer":
+    if (
+        questiondata["Selector"] == "Likert"
+        and questiondata["SubSelector"] == "SingleAnswer"
+    ):
         # subquestionorder = questiondata["ChoiceOrder"]
         subquestions = {
-            x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"]) for x in questiondata["Choices"].keys()
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+            for x in questiondata["Choices"].keys()
         }
         # subquestions = {x:questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
         # answerorder = questiondata["AnswerOrder"]
-        answers = {x: questiondata["Answers"][x]["Display"] for x in questiondata["Answers"].keys()}
+        answers = {
+            x: questiondata["Answers"][x]["Display"]
+            for x in questiondata["Answers"].keys()
+        }
         # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
 
         for x in subquestions.keys():
@@ -143,7 +172,10 @@ def get_Matrix_question_data(questiondata):
                     "Answers": None,
                 }
 
-    if questiondata["Selector"] == "Likert" and questiondata["SubSelector"] == "MultiAnswer":
+    if (
+        questiondata["Selector"] == "Likert"
+        and questiondata["SubSelector"] == "MultiAnswer"
+    ):
         # TODO: implement this routine!
         questioninfo = []
 
@@ -153,14 +185,20 @@ def get_Matrix_question_data(questiondata):
 def get_SBS_question_data(questiondata):
     # details here: https://www.qualtrics.com/support/survey-platform/survey-module/editing-questions/question-types-guide/standard-content/side-by-side/?parent=p001132
     questionid = questiondata["QuestionID"]
-    questiontag = questiondata["DataExportTag"]
+    questiontag = questiontag = (
+        questiondata["QuestionID"]
+        if questiondata["DataExportTag"] == ""
+        else questiondata["DataExportTag"]
+    )
     questiontype = questiondata["QuestionType"]
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questionselector = questiondata["Selector"]
     questioninfo = {}
     # loop through each additional question/column to get the subquestions and answer choices
     for x in questiondata["AdditionalQuestions"].keys():
-        questioninfo.update(parse_question_data(questiondata["AdditionalQuestions"][str(x)]))
+        questioninfo.update(
+            parse_question_data(questiondata["AdditionalQuestions"][str(x)])
+        )
     # loop through the quesitoninfo and add details on the SBS question Text and Selector for the SuperParent.
     for y in questioninfo.keys():
         questioninfo[y].update(
@@ -176,15 +214,15 @@ def get_SBS_question_data(questiondata):
 
 
 def parse_question_data(questiondata):
-    """Parse individual question data from qualtrics question. This function currently acts as a wrapper around the different question types 
-    Currently supports question types [MC, TE, Matrix, and SBS]. Note, unsupported question types are simply printed to terminal as note. 
+    """Parse individual question data from qualtrics question. This function currently acts as a wrapper around the different question types
+    Currently supports question types [MC, TE, Matrix, and SBS]. Note, unsupported question types are simply printed to terminal as note.
 
     Args:
         questiondata (dict): Data from Qualtrics API for a specific question, Q1 = surveydata["result"]["Questions"]["Q1"]
 
     Returns:
         dict: question data for a input
-    """    
+    """
     questiontype = questiondata["QuestionType"]
     if questiontype == "MC":
         output = get_MC_question_data(questiondata)
@@ -194,7 +232,7 @@ def parse_question_data(questiondata):
         output = get_Matrix_question_data(questiondata)
     elif questiontype == "SBS":
         output = get_SBS_question_data(questiondata)
-    elif questiontype == "DB": 
+    elif questiontype == "DB":
         print(
             f"Question {questiondata['QuestionID']} ({questiondata['DataExportTag']}) is a descriptive block (DB), so it is not included. {questiondata['DataExportTag']} has the following description:\n{questiondata['QuestionDescription']}\n"
         )
@@ -215,11 +253,13 @@ def parse_questions_from_survey(surveydata):
 
     Returns:
         dict: standardized question data from survey
-    """    
+    """
     all_survey_questions = {}
     for x in surveydata["result"]["Questions"].keys():
         # loop through each question and parse the question data
-        all_survey_questions.update(parse_question_data(surveydata["result"]["Questions"][x]))
+        all_survey_questions.update(
+            parse_question_data(surveydata["result"]["Questions"][x])
+        )
     return all_survey_questions
 
 
@@ -228,22 +268,32 @@ def remove_trash_questions(blockdata, questiondata):
 
     Args:
         blockdata (dict): The "result" "Blocks" response type from the qualtrics survey, which describes which blocks are used in the presentation of the survey
-        questiondata (dict): The questiondata from parse_questions_from_survey() 
+        questiondata (dict): The questiondata from parse_questions_from_survey()
 
     Returns:
         dict: Essentially just questiondata with the trash questions removed
-    """    
+    """
     outdata = {}
-    trashdata = [
-        y["QuestionID"]
-        for x in blockdata.keys()
-        for y in blockdata[str(x)]["BlockElements"]
-        if blockdata[str(x)]["Type"] == "Trash"
-    ]
+    # trashdata = [
+    #     y["QuestionID"]
+    #     for x in blockdata.keys()
+    #     if blockdata[str(x)]["Type"] == "Trash" if "BlockElements" not in blockdata[str(x)].keys() else  for y in blockdata[str(x)]["BlockElements"] if blockdata[str(x)]["Type"] == "Trash"
+    # ]
+    trashdata = []
+    for x in blockdata.keys():
+        if "BlockElements" not in blockdata[x].keys():
+            continue
+        for y in blockdata[str(x)]["BlockElements"]:
+            if blockdata[str(x)]["Type"] == "Trash":
+                trashdata.append(y["QuestionID"])
 
     for x in questiondata.keys():
         # since some questions have multiple questions, we need to filter by parentID or questionID
-        compareid = questiondata[x]["ParentID"] if "ParentID" in questiondata[x].keys() else questiondata[x]["ID"]
+        compareid = (
+            questiondata[x]["ParentID"]
+            if "ParentID" in questiondata[x].keys()
+            else questiondata[x]["ID"]
+        )
         if compareid not in trashdata:
             outdata[x] = questiondata[x]
 
@@ -258,7 +308,7 @@ def get_questions_from_survey(surveydata):
 
     Returns:
         dict : questiondata in standardized format with "trash" questions removed
-    """    
+    """
     qdata = parse_questions_from_survey(surveydata)
     questiondata = remove_trash_questions(surveydata["result"]["Blocks"], qdata)
     return questiondata
@@ -271,19 +321,19 @@ def get_metadata_from_survey(token, datacenter, surveyid):
     """Generates the metadata information from the Qualtrics survey to create the LORIS instrument
 
     Args:
-        token (str): Qualtrics API token 
+        token (str): Qualtrics API token
         datacenter (str): Qualtrics Datacenter
-        surveyid (str): Qualtrics survey ID 
+        surveyid (str): Qualtrics survey ID
 
     Returns:
-        json: json string of the instrument_data 
-    """    
+        json: json string of the instrument_data
+    """
     # pull survey question data from API
     surveydata = get_qualtrics_survey_definition(token, datacenter, surveyid)
     # process data into question format that mirrors data output
     parseddata = get_questions_from_survey(surveydata)
     # get question groups
-    
+
     # convert parsed data into the LORIS_instrument_builder instrument template format
     instrument_data = {
         "instrument_name": surveydata["result"]["SurveyName"],
@@ -296,8 +346,27 @@ def get_metadata_from_survey(token, datacenter, surveyid):
                 "field_name_external": parseddata[key]["ID"],
                 # "field_type_sql": parseddata[key]["QuestionType"], #
                 "field_type_sql": field_type_lookup(parseddata[key]),
-                "enum_values_sql": (list(parseddata[key]["Answers"].keys()) if parseddata[key]["Answers"] != None else False) if "Answers" in list(parseddata[key].keys()) else False,
-                "enum_values_php": ([f'{k} - {parseddata[key]["Answers"][k]}' for k in parseddata[key]["Answers"].keys()] if parseddata[key]["Answers"] != None else False) if "Answers" in list(parseddata[key].keys()) else False,
+                "enum_values_sql": (
+                    (
+                        list(parseddata[key]["Answers"].keys())
+                        if parseddata[key]["Answers"] != None
+                        else False
+                    )
+                    if "Answers" in list(parseddata[key].keys())
+                    else False
+                ),
+                "enum_values_php": (
+                    (
+                        [
+                            f'{k} - {parseddata[key]["Answers"][k]}'
+                            for k in parseddata[key]["Answers"].keys()
+                        ]
+                        if parseddata[key]["Answers"] != None
+                        else False
+                    )
+                    if "Answers" in list(parseddata[key].keys())
+                    else False
+                ),
                 "field_include_not_answered": False,
                 "field_default_value": False,
                 "associated_status_field": False,
@@ -311,7 +380,7 @@ def get_metadata_from_survey(token, datacenter, surveyid):
         },
         "groups": {},
     }
-    
+
     # return json.dumps(instrument_data, indent=4)
     return instrument_data
 
@@ -325,7 +394,9 @@ def qualtrics_api_request(method, baseUrl, headers):
     apimethod = str(method).upper().strip()
     method_types = ["GET", "POST", "DELETE"]
     if apimethod not in method_types:
-        raise ValueError(f"'{apimethod}' is invalid API method. Expected one of {method_types}")
+        raise ValueError(
+            f"'{apimethod}' is invalid API method. Expected one of {method_types}"
+        )
 
     try:
         response = requests.request(apimethod, baseUrl, headers=headers)
@@ -335,7 +406,9 @@ def qualtrics_api_request(method, baseUrl, headers):
             f"qualtrics api request failed due to timeout \n\tRequest: {baseUrl}"
         )  # \n\tHeaders: {headers}")
     except requests.exceptions.TooManyRedirects:
-        raise RuntimeError(f"URL request was bad. Try updating request. \n\tRequest: {baseUrl}")
+        raise RuntimeError(
+            f"URL request was bad. Try updating request. \n\tRequest: {baseUrl}"
+        )
     # except requests.exceptions.RequestException as e:
     #     # catastrophic error. bail
     #     raise SystemExit(e)
@@ -347,7 +420,9 @@ def qualtrics_api_request(method, baseUrl, headers):
 
 
 def get_qualtrics_survey_definition(token, datacenter, surveyid):
-    baseUrl = "https://{0}.qualtrics.com/API/v3/survey-definitions/{1}".format(datacenter, surveyid)
+    baseUrl = "https://{0}.qualtrics.com/API/v3/survey-definitions/{1}".format(
+        datacenter, surveyid
+    )
     headers = {"x-api-token": token}
 
     response = qualtrics_api_request("GET", baseUrl, headers).json()
@@ -360,8 +435,11 @@ def get_qualtrics_survey_definition(token, datacenter, surveyid):
 
     return response
 
+
 def get_qualtrics_survey_responses(token, datacenter, surveyid):
-    baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}/export-responses/".format(datacenter, surveyid)
+    baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}/export-responses/".format(
+        datacenter, surveyid
+    )
     headers = {"content-type": "application/json", "x-api-token": token}
 
     response = qualtrics_api_request("GET", baseUrl, headers).json()
@@ -374,6 +452,7 @@ def get_qualtrics_survey_responses(token, datacenter, surveyid):
     # TODO: check to make sure this works
 
     return response
+
 
 def field_type_lookup(question):
     """
@@ -401,7 +480,7 @@ def field_type_lookup(question):
         "MC": "enum",
         "TE": "varchar(255)",
         "Matrix": "enum",
-        # "SBS": "", 
+        # "SBS": "",
         # "descriptive": "",
         # "dropdown": "enum",
         # "notes": "text",
@@ -411,6 +490,7 @@ def field_type_lookup(question):
     }
     field_type = field_type_lookup[question["QuestionType"]]
     return field_type
+
 
 def make_enum_array(question):
     """
@@ -461,7 +541,11 @@ def main():
             "get_question_types",
             "get_question_tags",
         ]:
-            out = func(get_qualtrics_survey_definition(args.apitoken, args.datacenter, args.surveyid))
+            out = func(
+                get_qualtrics_survey_definition(
+                    args.apitoken, args.datacenter, args.surveyid
+                )
+            )
 
         print(out)
 
@@ -472,7 +556,7 @@ function_map = {
     "get_all_survey_questions": parse_questions_from_survey,
     "get_question_types": get_question_types,
     "get_question_tags": get_question_tags,
-    "convert_survey": get_metadata_from_survey
+    "convert_survey": get_metadata_from_survey,
 }
 
 
@@ -489,9 +573,20 @@ def parse_args():
         dest="command",
         help="Call a specific function from qualtrics.py file",
     )
-    parser.add_argument("--surveyid", type=str, dest="surveyid", help="Qualtrics survey ID")
-    parser.add_argument("--datacenter", type=str, dest="datacenter", help="Qualtrics datacenter")
-    parser.add_argument("-t", "--token", "--APItoken", type=str, dest="apitoken", help="Qualtrics API token")
+    parser.add_argument(
+        "--surveyid", type=str, dest="surveyid", help="Qualtrics survey ID"
+    )
+    parser.add_argument(
+        "--datacenter", type=str, dest="datacenter", help="Qualtrics datacenter"
+    )
+    parser.add_argument(
+        "-t",
+        "--token",
+        "--APItoken",
+        type=str,
+        dest="apitoken",
+        help="Qualtrics API token",
+    )
     return parser.parse_args()
 
 
