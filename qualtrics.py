@@ -129,7 +129,12 @@ def get_Matrix_question_data(questiondata):
     )
     questiontype = questiondata["QuestionType"]
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
-    questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
+
+    try:
+        questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
+    except Exception as e:
+        print(f"{e} key does not exist for {questiondata['QuestionID']}\n")
+
     questioninfo = {}
     if (
         questiondata["Selector"] == "Likert"
