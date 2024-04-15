@@ -76,7 +76,11 @@ def get_MC_question_data(questiondata):
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
     questioninfo = {}
-    if questiondata["Selector"] == "SAVR" and questiondata["SubSelector"] == "TX":
+    if (
+        questiondata["Selector"] in ["SAVR", "SAHR"]
+        # check compatibility with SACOL, DL, or SB
+        and questiondata["SubSelector"] == "TX"
+    ):
         answers = {
             x: questiondata["Choices"][str(x)]["Display"]
             for x in questiondata["ChoiceOrder"]
