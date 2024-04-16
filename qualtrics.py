@@ -178,10 +178,50 @@ def get_Matrix_question_data(questiondata):
 
     if (
         questiondata["Selector"] == "Likert"
-        and questiondata["SubSelector"] == "MultiAnswer"
+        and questiondata["SubSelector"] == "MultipleAnswer"
     ):
         # TODO: implement this routine!
-        questioninfo = []
+        # subquestionorder = questiondata["ChoiceOrder"]
+        subquestions = {
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+            for x in questiondata["Choices"].keys()
+        }
+        # subquestions = {x:questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
+        # answerorder = questiondata["AnswerOrder"]
+        answers = {
+            x: questiondata["Answers"][x]["Display"]
+            for x in questiondata["Answers"].keys()
+        }
+        # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
+        answervalues = {"0": "no", "1": "yes"}
+
+        for x in subquestions.keys():
+            for y in answers.keys():
+                questioninfo[f"{questionid}_{x}_{y}"] = {
+                    "ID": f"{questionid}_{x}_{y}",
+                    "Tag": f"{questiontag}_{x}_{y}",
+                    "ParentID": questionid,
+                    "ParentText": questiontext,
+                    "ParentSelector": questionselector,
+                    "QuestionType": questiontype,
+                    "QuestionText": f"{subquestions[x]} - ({answers[y]})",
+                    "Answers": answervalues,
+                }
+                # TODO: test if this works
+                if "TextEntry" in questiondata["Choices"][str(x)].keys():
+                    questioninfo[f"{questionid}_{x}_{y}_TEXT"] = {
+                        "ID": f"{questionid}_{x}_{y}_TEXT",
+                        "Tag": f"{questiontag}_{x}_{y}_TEXT",
+                        "ParentID": questionid,
+                        "ParentText": questiontext,
+                        "ParentSelector": questionselector,
+                        "QuestionType": "TE",
+                        "QuestionText": f'{re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
+                        "Selector": "SL",
+                        "Answers": None,
+                    }
+        # questioninfo = []
+        # subquestionorder = questiondata["ChoiceOrder"]
 
     return questioninfo
 
@@ -262,7 +302,7 @@ def parse_questions_from_survey(surveydata, sorted=True):
     if sorted:
         # loop through survey flow list of blocks
         for x in surveydata["result"]["SurveyFlow"]["Flow"]:
-            if x["Type"] in ["Standard", "Block", "Default"]:
+            if x["Type"] in ["Standard", "Block", "Default", "Root"]:
                 # loop through each block, and the set order of BlockElements
                 for y in surveydata["result"]["Blocks"][x["ID"]]["BlockElements"]:
                     if y["Type"] == "Question":
