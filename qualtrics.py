@@ -249,7 +249,7 @@ def parse_question_data(questiondata):
     return output
 
 
-def parse_questions_from_survey(surveydata):
+def parse_questions_from_survey(surveydata, sorted=True):
     """get standardized question data from qualtrics survey response
 
     Args:
@@ -259,11 +259,25 @@ def parse_questions_from_survey(surveydata):
         dict: standardized question data from survey
     """
     all_survey_questions = {}
-    for x in surveydata["result"]["Questions"].keys():
-        # loop through each question and parse the question data
-        all_survey_questions.update(
-            parse_question_data(surveydata["result"]["Questions"][x])
-        )
+    if sorted:
+        # loop through survey flow list of blocks
+        for x in surveydata["result"]["SurveyFlow"]["Flow"]:
+            if x["Type"] == "Standard":
+                # loop through each block, and the set order of BlockElements
+                for y in surveydata["result"]["Blocks"][x["ID"]]["BlockElements"]:
+                    if y["Type"] == "Question":
+                        all_survey_questions.update(
+                            parse_question_data(
+                                surveydata["result"]["Questions"][y["QuestionID"]]
+                            )
+                        )
+
+    else:
+        for x in surveydata["result"]["Questions"].keys():
+            # loop through each question and parse the question data
+            all_survey_questions.update(
+                parse_question_data(surveydata["result"]["Questions"][x])
+            )
     return all_survey_questions
 
 
