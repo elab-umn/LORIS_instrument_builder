@@ -262,7 +262,7 @@ def parse_questions_from_survey(surveydata, sorted=True):
     if sorted:
         # loop through survey flow list of blocks
         for x in surveydata["result"]["SurveyFlow"]["Flow"]:
-            if x["Type"] == "Standard":
+            if x["Type"] in ["Standard", "Block", "Default"]:
                 # loop through each block, and the set order of BlockElements
                 for y in surveydata["result"]["Blocks"][x["ID"]]["BlockElements"]:
                     if y["Type"] == "Question":
