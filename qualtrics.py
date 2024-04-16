@@ -193,7 +193,7 @@ def get_Matrix_question_data(questiondata):
             for x in questiondata["Answers"].keys()
         }
         # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
-        answervalues = {"0": "no", "1": "yes"}
+        answervalues = {None: "no", "1": "yes"}
 
         for x in subquestions.keys():
             for y in answers.keys():
