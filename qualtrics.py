@@ -74,11 +74,15 @@ def get_MC_question_data(questiondata):
     )
     questiontype = questiondata["QuestionType"]
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
-    questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
+    if "SubSelector" in questiondata.keys():
+        questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
+    else:
+        questionselector = f'{questiondata["Selector"]}'
     questioninfo = {}
     if (
         questiondata["Selector"] in ["SAVR", "SAHR"]
         # check compatibility with SACOL, DL, or SB
+        and "SubSelector" in questiondata.keys()
         and questiondata["SubSelector"] == "TX"
     ):
         answers = {
@@ -105,6 +109,31 @@ def get_MC_question_data(questiondata):
                     "Selector": "SL",
                     "Answers": None,
                 }
+    if questiondata["Selector"] in ["DL"]:
+        answers = {
+            x: questiondata["Choices"][str(x)]["Display"]
+            for x in questiondata["ChoiceOrder"]
+        }
+        questioninfo[questionid] = {
+            "ID": questionid,
+            "Tag": questiontag,
+            "QuestionType": questiontype,
+            "QuestionText": questiontext,
+            "Selector": questionselector,
+            "Answers": answers,
+        }
+        # for answers that might have text entry included, as in selecting "Other: "
+        # for x in questiondata["ChoiceOrder"]:
+        #     if "TextEntry" in questiondata["Choices"][str(x)].keys():
+        #         questioninfo[f"{questionid}_{x}_TEXT"] = {
+        #             "ID": f"{questionid}_{x}_TEXT",
+        #             "Tag": f"{questiontag}_{x}_TEXT",
+        #             "ParentID": questionid,
+        #             "QuestionType": "TE",
+        #             "QuestionText": f'{questiontext} - {re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
+        #             "Selector": "SL",
+        #             "Answers": None,
+        #         }
     # if questiondata["Selector"] == 'MAVR' and questiondata["SubSelector"] == 'TX':
 
     return questioninfo
