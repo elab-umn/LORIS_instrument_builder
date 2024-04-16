@@ -330,6 +330,7 @@ def parse_questions_from_survey(surveydata, sorted=True):
     all_survey_questions = {}
     if sorted:
         # loop through survey flow list of blocks
+        # TODO: fix this for complex survey flows like ACC
         for x in surveydata["result"]["SurveyFlow"]["Flow"]:
             if x["Type"] in ["Standard", "Block", "Default", "Root"]:
                 # loop through each block, and the set order of BlockElements
