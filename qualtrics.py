@@ -425,7 +425,10 @@ def get_metadata_from_survey(token, datacenter, surveyid):
     # convert parsed data into the LORIS_instrument_builder instrument template format
     instrument_data = {
         "instrument_name": surveydata["result"]["SurveyName"],
-        "instrument_name_sql": surveydata["result"]["SurveyName"].lower(),
+        # TODO: change this to remove spaces
+        "instrument_name_sql": surveydata["result"]["SurveyName"]
+        .lower()
+        .replace(" ", "_"),
         "pages": {},
         "fields": {
             f"field{index + 1}": {
