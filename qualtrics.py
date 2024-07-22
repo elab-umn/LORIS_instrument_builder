@@ -89,6 +89,7 @@ def get_MC_question_data(questiondata):
             x: questiondata["Choices"][str(x)]["Display"]
             for x in questiondata["ChoiceOrder"]
         }
+        print(f"processing question data for {questionid} with tag {questiontype}")
         questioninfo[questionid] = {
             "ID": questionid,
             "Tag": questiontag,
@@ -296,6 +297,9 @@ def parse_question_data(questiondata):
     Returns:
         dict: question data for a input
     """
+    # print(
+    #     f"Question {questiondata['QuestionID']} ({questiondata['DataExportTag']}) has the following description:\n{questiondata['QuestionDescription']}\n"
+    # )
     questiontype = questiondata["QuestionType"]
     if questiontype == "MC":
         output = get_MC_question_data(questiondata)
@@ -318,6 +322,24 @@ def parse_question_data(questiondata):
     return output
 
 
+def pull_question_ids_from_survey_flow(surveyflow: dict):
+    questionids = []
+
+    def recursive_search(d):
+        for key, value in d.items():
+            if key == "QuestionID":
+                questionids.append(value)
+            elif isinstance(value, dict):
+                recursive_search(value)
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        recursive_search(item)
+
+    recursive_search(surveyflow)
+    return questionids
+
+
 def parse_questions_from_survey(surveydata, sorted=True):
     """get standardized question data from qualtrics survey response
 
@@ -331,16 +353,22 @@ def parse_questions_from_survey(surveydata, sorted=True):
     if sorted:
         # loop through survey flow list of blocks
         # TODO: fix this for complex survey flows like ACC
+        # for x in surveydata["result"]["SurveyFlow"]["Flow"]:
+        #     if x["Type"] in ["Standard", "Block", "Default", "Root", "ReferenceSurvey"]:
+        #         # loop through each block, and the set order of BlockElements
+        #         for y in surveydata["result"]["Blocks"][x["ID"]]["BlockElements"]:
+        #             if y["Type"] == "Question":
+        #                 all_survey_questions.update(
+        #                     parse_question_data(
+        #                         surveydata["result"]["Questions"][y["QuestionID"]]
+        #                     )
+        #
         for x in surveydata["result"]["SurveyFlow"]["Flow"]:
-            if x["Type"] in ["Standard", "Block", "Default", "Root"]:
-                # loop through each block, and the set order of BlockElements
-                for y in surveydata["result"]["Blocks"][x["ID"]]["BlockElements"]:
-                    if y["Type"] == "Question":
-                        all_survey_questions.update(
-                            parse_question_data(
-                                surveydata["result"]["Questions"][y["QuestionID"]]
-                            )
-                        )
+            tmpquestions = pull_question_ids_from_survey_flow(x)
+            for y in tmpquestions:
+                all_survey_questions.update(
+                    parse_question_data(surveydata["result"]["Questions"][y])
+                )
 
     else:
         for x in surveydata["result"]["Questions"].keys():
@@ -425,7 +453,6 @@ def get_metadata_from_survey(token, datacenter, surveyid):
     # convert parsed data into the LORIS_instrument_builder instrument template format
     instrument_data = {
         "instrument_name": surveydata["result"]["SurveyName"],
-        # TODO: change this to remove spaces
         "instrument_name_sql": surveydata["result"]["SurveyName"]
         .lower()
         .replace(" ", "_"),

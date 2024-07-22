@@ -3,7 +3,7 @@ import configparser
 import re
 
 
-def connect_to_database(database: str = "redcap", dbconfig = "db_config.ini"):
+def connect_to_database(database: str = "redcap", dbconfig="db_config.ini"):
     """connect_to_database standardizes connections to all the various databases that may be used in different python scripts.
 
     Args:
@@ -25,8 +25,9 @@ def connect_to_database(database: str = "redcap", dbconfig = "db_config.ini"):
     ## CUSTOMIZATION: edit available dbs to connect to
     db_types = ["redcap", "prod", "dev"]
     if db not in db_types:
-        raise ValueError(f"Invalid DB connection for '{db}'. Expected one of {db_types}")
-
+        raise ValueError(
+            f"Invalid DB connection for '{db}'. Expected one of {db_types}"
+        )
     # Read config file for database connections
     config = configparser.ConfigParser()
     try:
@@ -36,7 +37,6 @@ def connect_to_database(database: str = "redcap", dbconfig = "db_config.ini"):
         raise FileNotFoundError(
             "database config file ({dbconfig}) not found. Check script directory or path to {dbconfig}"
         )
-
     # check config information is available, and connect to the databse selected
     if config.has_section(db):
         try:
@@ -54,15 +54,18 @@ def connect_to_database(database: str = "redcap", dbconfig = "db_config.ini"):
             # handle errors in from the mysql.connector for username/password/db/etc
             # other mysql.connector.errorcodes outlined here: https://github.com/mysql/mysql-connector-python/blob/master/lib/mysqlx/errorcode.py
             if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-                raise RuntimeError("mysql.connector.error -- Something is wrong with your user name or password")
+                raise RuntimeError(
+                    "mysql.connector.error -- Something is wrong with your user name or password"
+                )
             elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
                 raise RuntimeError("mysql.connector.error -- Database does not exist")
             else:
                 raise RuntimeError("mysql.connector.error -- " + err)
-
     else:
         # failsafe is config doesn't have expecated connection information
-        raise RuntimeError("CONFIG ERROR -- Something went wrong. DB connection not found in {dbconfig} file.")
+        raise RuntimeError(
+            "CONFIG ERROR -- Something went wrong. DB connection not found in {dbconfig} file."
+        )
 
 
 def execute_select_commentid(mydb, mycursor, statement):
@@ -71,7 +74,7 @@ def execute_select_commentid(mydb, mycursor, statement):
     # Check if statement is a select statement
     if not statement.startswith("SELECT"):
         commentid_found = ""
-        errormsg = "statement does not start with \"SELECT\""
+        errormsg = 'statement does not start with "SELECT"'
     # Check if single statement
     elif len(re.findall(";", statement)) > 1:
         commentid_found = ""
