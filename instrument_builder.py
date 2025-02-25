@@ -82,6 +82,7 @@ def main():
                 )
 
             instrument = get_metadata_from_survey(token, datacenter, survey)
+            # print("instrument: ", instrument)
 
             if args.survey != None:
                 # if they specified survey with the config files, replace the instrument name with what's saved in the config file

@@ -1,9 +1,13 @@
-import os
+import io, os
+import sys
 import re
 import requests
 import argparse
 import configparser
 import json
+import zipfile
+import time
+import pandas as pd
 
 # from redcap_config import token, api_route
 # import pandas as pd
@@ -48,24 +52,41 @@ def get_TE_question_data(questiondata):
         if questiondata["DataExportTag"] == ""
         else questiondata["DataExportTag"]
     )
+    if "Choices" in questiondata:
+        subquestions = {
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+            for x in questiondata["Choices"].keys()
+        }
+
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questiontype = questiondata["QuestionType"]
     questionselector = questiondata["Selector"]
     questioninfo = {}
-    questioninfo[questionid] = {
-        "ID": questionid,
-        "Tag": questiontag,
-        "QuestionType": questiontype,
-        "QuestionText": questiontext,
-        "Selector": questionselector,
-        "Answers": None,
-    }
+
+    if "Choices" in questiondata:
+        for x in subquestions.keys():
+            questioninfo[f"{questionid}_{x}"] = {
+                "ID": f"{questionid}_{x}",
+                "Tag": f"{questiontag}_{x}",
+                "QuestionType": questiontype,
+                "QuestionText": subquestions[x],
+                "Selector": questionselector,
+                "Answers": None,
+            }
+    else:
+        questioninfo[questionid] = {
+            "ID": questionid,
+            "Tag": questiontag,
+            "QuestionType": questiontype,
+            "QuestionText": questiontext,
+            "Selector": questionselector,
+            "Answers": None,
+        }
     return questioninfo
 
 
 def get_MC_question_data(questiondata):
     # details on MC questions here: https://www.qualtrics.com/support/survey-platform/survey-module/editing-questions/question-types-guide/standard-content/multiple-choice/?parent=p001132
-
     questionid = questiondata["QuestionID"]
     questiontag = (
         questiondata["QuestionID"]
@@ -80,16 +101,16 @@ def get_MC_question_data(questiondata):
         questionselector = f'{questiondata["Selector"]}'
     questioninfo = {}
     if (
-        questiondata["Selector"] in ["SAVR", "SAHR"]
+        questiondata["Selector"] in ["SAVR", "SAHR", "SACOL"]
         # check compatibility with SACOL, DL, or SB
         and "SubSelector" in questiondata.keys()
         and questiondata["SubSelector"] == "TX"
     ):
         answers = {
-            x: questiondata["Choices"][str(x)]["Display"]
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])
             for x in questiondata["ChoiceOrder"]
         }
-        print(f"processing question data for {questionid} with tag {questiontype}")
+        # print(f"processing question data for {questionid} with tag {questiontype}")
         questioninfo[questionid] = {
             "ID": questionid,
             "Tag": questiontag,
@@ -112,7 +133,7 @@ def get_MC_question_data(questiondata):
                 }
     if questiondata["Selector"] in ["DL"]:
         answers = {
-            x: questiondata["Choices"][str(x)]["Display"]
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])
             for x in questiondata["ChoiceOrder"]
         }
         questioninfo[questionid] = {
@@ -135,7 +156,38 @@ def get_MC_question_data(questiondata):
         #             "Selector": "SL",
         #             "Answers": None,
         #         }
-    # if questiondata["Selector"] == 'MAVR' and questiondata["SubSelector"] == 'TX':
+    if (
+        questiondata["Selector"] in ["MAVR", "MACOL"]
+        and "SubSelector" in questiondata.keys()
+        and questiondata["SubSelector"] == "TX"
+    ):
+        answers = {
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])
+            for x in questiondata["ChoiceOrder"]
+        }
+        for x in answers.keys():
+            questioninfo[f"{questionid}_{x}"] = {
+                "ID": f"{questionid}_{x}",
+                "Tag": f"{questiontag}_{x}",
+                "ParentID": questionid,
+                "ParentText": questiontext,
+                "ParentSelector": questionselector,
+                "QuestionType": questiontype,
+                "QuestionText": f"{questiontext} - {re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])}",
+                "Answers": {"1": "yes"},
+            }
+            # for answers that might have text entry included, as in selecting "Other: "
+            for x in questiondata["ChoiceOrder"]:
+                if "TextEntry" in questiondata["Choices"][str(x)].keys():
+                    questioninfo[f"{questionid}_{x}_TEXT"] = {
+                        "ID": f"{questionid}_{x}_TEXT",
+                        "Tag": f"{questiontag}_{x}_TEXT",
+                        "ParentID": questionid,
+                        "QuestionType": "TE",
+                        "QuestionText": f'{questiontext} - {re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
+                        "Selector": "SL",
+                        "Answers": None,
+                    }
 
     return questioninfo
 
@@ -165,22 +217,167 @@ def get_Matrix_question_data(questiondata):
     questiontext = re.sub(htmlcleaner, "", questiondata["QuestionText"])
     questionselector = f'{questiondata["Selector"]}_{questiondata["SubSelector"]}'
     questioninfo = {}
-    if (
-        questiondata["Selector"] == "Likert"
-        and questiondata["SubSelector"] == "SingleAnswer"
-    ):
-        # subquestionorder = questiondata["ChoiceOrder"]
+    if questiondata["Selector"] == "Likert":
+        if questiondata["SubSelector"] == "SingleAnswer":
+            # subquestionorder = questiondata["ChoiceOrder"]
+            subquestions = {
+                x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+                for x in questiondata["Choices"].keys()
+            }
+            # subquestions = {x:questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
+            # answerorder = questiondata["AnswerOrder"]
+            answers = {
+                x: questiondata["Answers"][x]["Display"]
+                for x in questiondata["Answers"].keys()
+            }
+            # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
+
+            for x in subquestions.keys():
+                questioninfo[f"{questionid}_{x}"] = {
+                    "ID": f"{questionid}_{x}",
+                    "Tag": f"{questiontag}_{x}",
+                    "ParentID": questionid,
+                    "ParentText": questiontext,
+                    "ParentSelector": questionselector,
+                    "QuestionType": questiontype,
+                    "QuestionText": subquestions[x],
+                    "Answers": answers,
+                }
+                if "TextEntry" in questiondata["Choices"][str(x)].keys():
+                    questioninfo[f"{questionid}_{x}_TEXT"] = {
+                        "ID": f"{questionid}_{x}_TEXT",
+                        "Tag": f"{questiontag}_{x}_TEXT",
+                        "ParentID": questionid,
+                        "ParentText": questiontext,
+                        "ParentSelector": questionselector,
+                        "QuestionType": "TE",
+                        "QuestionText": f'{re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
+                        "Selector": "SL",
+                        "Answers": None,
+                    }
+
+        if questiondata["SubSelector"] == "MultipleAnswer":
+            # TODO: implement this routine!
+            # subquestionorder = questiondata["ChoiceOrder"]
+            subquestions = {
+                x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+                for x in questiondata["Choices"].keys()
+            }
+            # subquestions = {x:questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
+            # answerorder = questiondata["AnswerOrder"]
+            answers = {
+                x: questiondata["Answers"][x]["Display"]
+                for x in questiondata["Answers"].keys()
+            }
+            # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
+            answervalues = {None: "no", "1": "yes"}
+
+            for x in subquestions.keys():
+                for y in answers.keys():
+                    questioninfo[f"{questionid}_{x}_{y}"] = {
+                        "ID": f"{questionid}_{x}_{y}",
+                        "Tag": f"{questiontag}_{x}_{y}",
+                        "ParentID": questionid,
+                        "ParentText": questiontext,
+                        "ParentSelector": questionselector,
+                        "QuestionType": questiontype,
+                        "QuestionText": f"{subquestions[x]} - ({answers[y]})",
+                        "Answers": answervalues,
+                    }
+                    # TODO: test if this works
+                    if "TextEntry" in questiondata["Choices"][str(x)].keys():
+                        questioninfo[f"{questionid}_{x}_{y}_TEXT"] = {
+                            "ID": f"{questionid}_{x}_{y}_TEXT",
+                            "Tag": f"{questiontag}_{x}_{y}_TEXT",
+                            "ParentID": questionid,
+                            "ParentText": questiontext,
+                            "ParentSelector": questionselector,
+                            "QuestionType": "TE",
+                            "QuestionText": f'{re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
+                            "Selector": "SL",
+                            "Answers": None,
+                        }
+            # questioninfo = []
+            # subquestionorder = questiondata["ChoiceOrder"]
+
+            # FIXME: not handling cases where questiondata["Selector"] != 'Likert'
+            # FIXME: not handling cases where questiondata["Selector"] == 'Likert' but questiondata["SubSelector"] is not 'SingleAnswer' or 'MultipleAnswer'
+
+        if (
+            questiondata["SubSelector"] != "MultipleAnswer"
+            and questiondata["SubSelector"] != "SingleAnswer"
+        ):
+            # If "Choices" is a key in the dict, load the choices
+            if "Choices" in questiondata.keys():
+                subquestions = {
+                    x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+                    for x in questiondata["Choices"].keys()
+                }
+
+            # Case where subselector is "DL" (dropdown list)
+            answers = {
+                x: questiondata["Answers"][x]["Display"]
+                for x in questiondata["Answers"].keys()
+            }
+
+            if "Choices" in questiondata.keys():
+                # Loop through each choice, creating a questionID for each instance
+                for x in subquestions.keys():
+                    questioninfo[f"{questionid}_{x}"] = {
+                        "ID": f"{questionid}_{x}",
+                        "Tag": f"{questiontag}_{x}",
+                        "ParentID": questionid,
+                        "ParentText": questiontext,
+                        "ParentSelector": questionselector,
+                        "QuestionType": questiontype,
+                        "QuestionText": f"{subquestions[x]} - {questiontext}",
+                        "Answers": answers,
+                    }
+            else:
+                questioninfo[questionid] = {
+                    "ID": questionid,
+                    "Tag": questiontag,
+                    "QuestionType": questiontype,
+                    "QuestionText": questiontext,
+                    "Selector": questionselector,
+                    "Answers": answers,
+                }
+    elif questiondata["Selector"] == "TE":
         subquestions = {
             x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
             for x in questiondata["Choices"].keys()
         }
-        # subquestions = {x:questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
-        # answerorder = questiondata["AnswerOrder"]
+
         answers = {
             x: questiondata["Answers"][x]["Display"]
             for x in questiondata["Answers"].keys()
         }
-        # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
+
+        for x in subquestions.keys():
+            for y in answers.keys():
+                questioninfo[f"{questionid}_{x}_{y}_TEXT"] = {
+                    "ID": f"{questionid}_{x}_{y}_TEXT",
+                    "Tag": f"{questiontag}_{x}_{y}_TEXT",
+                    "ParentID": questionid,
+                    "ParentText": questiontext,
+                    "ParentSelector": questionselector,
+                    "QuestionType": "TE",
+                    "QuestionText": f"{subquestions[x]} - {answers[y]}",
+                    "Selector": "SL",
+                    "Answers": None,
+                }
+
+    elif questiondata["Selector"] == "Profile":
+        subquestions = {
+            x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
+            for x in questiondata["Choices"].keys()
+        }
+
+        answers = {
+            sub_key: sub_value["Display"]
+            for key in questiondata["Answers"]
+            for sub_key, sub_value in questiondata["Answers"][key].items()
+        }
 
         for x in subquestions.keys():
             questioninfo[f"{questionid}_{x}"] = {
@@ -193,65 +390,6 @@ def get_Matrix_question_data(questiondata):
                 "QuestionText": subquestions[x],
                 "Answers": answers,
             }
-            if "TextEntry" in questiondata["Choices"][str(x)].keys():
-                questioninfo[f"{questionid}_{x}_TEXT"] = {
-                    "ID": f"{questionid}_{x}_TEXT",
-                    "Tag": f"{questiontag}_{x}_TEXT",
-                    "ParentID": questionid,
-                    "ParentText": questiontext,
-                    "ParentSelector": questionselector,
-                    "QuestionType": "TE",
-                    "QuestionText": f'{re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
-                    "Selector": "SL",
-                    "Answers": None,
-                }
-
-    if (
-        questiondata["Selector"] == "Likert"
-        and questiondata["SubSelector"] == "MultipleAnswer"
-    ):
-        # TODO: implement this routine!
-        # subquestionorder = questiondata["ChoiceOrder"]
-        subquestions = {
-            x: re.sub(htmlcleaner, "", questiondata["Choices"][x]["Display"])
-            for x in questiondata["Choices"].keys()
-        }
-        # subquestions = {x:questiondata["Choices"][str(x)]["Display"] for x in questiondata["ChoiceOrder"]}
-        # answerorder = questiondata["AnswerOrder"]
-        answers = {
-            x: questiondata["Answers"][x]["Display"]
-            for x in questiondata["Answers"].keys()
-        }
-        # answers = {x:questiondata["Answers"][str(x)]["Display"] for x in questiondata["AnswerOrder"]}
-        answervalues = {None: "no", "1": "yes"}
-
-        for x in subquestions.keys():
-            for y in answers.keys():
-                questioninfo[f"{questionid}_{x}_{y}"] = {
-                    "ID": f"{questionid}_{x}_{y}",
-                    "Tag": f"{questiontag}_{x}_{y}",
-                    "ParentID": questionid,
-                    "ParentText": questiontext,
-                    "ParentSelector": questionselector,
-                    "QuestionType": questiontype,
-                    "QuestionText": f"{subquestions[x]} - ({answers[y]})",
-                    "Answers": answervalues,
-                }
-                # TODO: test if this works
-                if "TextEntry" in questiondata["Choices"][str(x)].keys():
-                    questioninfo[f"{questionid}_{x}_{y}_TEXT"] = {
-                        "ID": f"{questionid}_{x}_{y}_TEXT",
-                        "Tag": f"{questiontag}_{x}_{y}_TEXT",
-                        "ParentID": questionid,
-                        "ParentText": questiontext,
-                        "ParentSelector": questionselector,
-                        "QuestionType": "TE",
-                        "QuestionText": f'{re.sub(htmlcleaner, "", questiondata["Choices"][str(x)]["Display"])} - Text',
-                        "Selector": "SL",
-                        "Answers": None,
-                    }
-        # questioninfo = []
-        # subquestionorder = questiondata["ChoiceOrder"]
 
     return questioninfo
 
@@ -284,6 +422,7 @@ def get_SBS_question_data(questiondata):
                 "SuperParentSelector": questionselector,
             }
         )
+
     return questioninfo
 
 
@@ -322,7 +461,7 @@ def parse_question_data(questiondata):
     return output
 
 
-def pull_question_ids_from_survey_flow(surveyflow: dict):
+def pull_question_ids_from_dictionary(surveyDict: dict):
     questionids = []
 
     def recursive_search(d):
@@ -336,7 +475,7 @@ def pull_question_ids_from_survey_flow(surveyflow: dict):
                     if isinstance(item, dict):
                         recursive_search(item)
 
-    recursive_search(surveyflow)
+    recursive_search(surveyDict)
     return questionids
 
 
@@ -349,6 +488,17 @@ def parse_questions_from_survey(surveydata, sorted=True):
     Returns:
         dict: standardized question data from survey
     """
+
+    # Length of surveydata["result"]["Questions"]: 771
+
+    # print(surveydata["result"]["SurveyFlow"])
+
+    """ with open("Questions.json", "w") as file:
+        file.seek(0)
+        json.dump(surveydata["result"]["Questions"], file, indent=4)
+
+    exit() """
+
     all_survey_questions = {}
     if sorted:
         # loop through survey flow list of blocks
@@ -363,19 +513,33 @@ def parse_questions_from_survey(surveydata, sorted=True):
         #                         surveydata["result"]["Questions"][y["QuestionID"]]
         #                     )
         #
-        for x in surveydata["result"]["SurveyFlow"]["Flow"]:
-            tmpquestions = pull_question_ids_from_survey_flow(x)
-            for y in tmpquestions:
-                all_survey_questions.update(
-                    parse_question_data(surveydata["result"]["Questions"][y])
-                )
+        """for x in surveydata["result"]["SurveyFlow"]["Flow"]:
+        tmpquestions = pull_question_ids_from_dictionary(x)
+        print(len(tmpquestions))
+        for y in tmpquestions:
+            # print(y)      #only prints the question IDs of the ones that end up in the template, not all the expected questions
+            all_survey_questions.update(
+                parse_question_data(surveydata["result"]["Questions"][y])
+            )"""
 
+        # Go through all the question blocks, and get every question ID within them
+        tmpquestions = pull_question_ids_from_dictionary(surveydata["result"]["Blocks"])
+        for x in tmpquestions:
+            # loop through each question and parse the question data
+            all_survey_questions.update(
+                parse_question_data(surveydata["result"]["Questions"][x])
+            )
+
+        print(len(tmpquestions))
+        print(len(all_survey_questions))
     else:
         for x in surveydata["result"]["Questions"].keys():
             # loop through each question and parse the question data
             all_survey_questions.update(
                 parse_question_data(surveydata["result"]["Questions"][x])
             )
+
+    # print("Survey questions: ", len(all_survey_questions))
     return all_survey_questions
 
 
@@ -460,13 +624,15 @@ def get_metadata_from_survey(token, datacenter, surveyid):
         "fields": {
             f"field{index + 1}": {
                 "field_name_sql": parseddata[key]["Tag"],
+                # "field_name_sql": "",
                 "field_front_text_php": parseddata[key]["QuestionText"].lower(),
                 "field_name_external": parseddata[key]["ID"],
                 # "field_type_sql": parseddata[key]["QuestionType"], #
                 "field_type_sql": field_type_lookup(parseddata[key]),
                 "enum_values_sql": (
                     (
-                        list(parseddata[key]["Answers"].keys())
+                        # list(parseddata[key]["Answers"].keys())
+                        []
                         if parseddata[key]["Answers"] != None
                         else False
                     )
@@ -493,11 +659,36 @@ def get_metadata_from_survey(token, datacenter, surveyid):
                 "group_php": False,
                 "rule_php": False,
                 "note_php": False,
+                "hidden_on_sql": False,
+                "process_fx_external_to_sql": (
+                    (
+                        {"enum": None}
+                        if parseddata[key]["Answers"] != None
+                        else {"text": None}
+                    )
+                    if "Answers" in list(parseddata[key].keys())
+                    else False
+                ),
+                "enum_values_external": (
+                    (
+                        list(parseddata[key]["Answers"].keys())
+                        if parseddata[key]["Answers"] != None
+                        else False
+                    )
+                    if "Answers" in list(parseddata[key].keys())
+                    else False
+                ),
             }
             for index, key in enumerate(parseddata)
         },
         "groups": {},
     }
+
+    # print(instrument_data)
+    """ with open("test.json", "w") as file:
+        file.seek(0)
+        json.dump(instrument_data, file, indent=4)
+    exit() """
 
     # return json.dumps(instrument_data, indent=4)
     return instrument_data
@@ -546,7 +737,7 @@ def get_qualtrics_survey_definition(token, datacenter, surveyid):
     response = qualtrics_api_request("GET", baseUrl, headers).json()
 
     # we check if the response is okay, and if it is not, we raise the RuntimeError
-    if re.search(pattern="^200\s", string=response["meta"]["httpStatus"]) is None:
+    if re.search(pattern=r"^200\s", string=response["meta"]["httpStatus"]) is None:
         raise RuntimeError(
             f"API request failed: {response['meta']['httpStatus']}, {response['meta']['error']['errorMessage']}"
         )
@@ -554,22 +745,168 @@ def get_qualtrics_survey_definition(token, datacenter, surveyid):
     return response
 
 
-def get_qualtrics_survey_responses(token, datacenter, surveyid):
+def get_qualtrics_survey_responses(
+    token,
+    datacenter,
+    surveyid,
+    fileformat="tsv",
+    lastpulldate=None,
+    fileprefix=None,
+    saveoutput=False,
+    outputdirectory="MyQualtricsDownloads",
+):
+    # baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}/export-responses/".format(datacenter, surveyid)
+    # headers = {"content-type": "application/json", "x-api-token": token}
+
+    if fileformat not in ["csv", "tsv", "spss"]:
+        print("fileFormat must be either csv, tsv, or spss")
+        sys.exit(2)
+
+    r = re.compile(r"^SV_.*")
+    m = r.match(surveyid)
+    if not m:
+        print("survey Id must match ^SV_.*")
+        sys.exit(2)
+
+    #     return exportSurvey(token, surveyid, datacenter, fileformat, saveOutput=saveoutput, outputDirectory=outputdirectory, lastPullDate=lastpulldate, filePrefix=None)
+
+    #     # response = qualtrics_api_request("POST", baseUrl, headers).json()
+
+    # def exportSurvey(apiToken, surveyId, dataCenter, fileFormat, saveOutput=False, outputDirectory=None, lastPullDate=None, filePrefix=None):
+    #     # copied from https://api.qualtrics.com/ZG9jOjg3NzY3MA-getting-survey-responses-via-the-new-export-ap-is
+
+    # surveyId = surveyid
+    # fileFormat = fileformat
+    # dataCenter = datacenter
+    # lastpulldate = lastpulldate
+
+    # Setting static parameters
+    requestCheckProgress = 0.0
+    progressStatus = "inProgress"
     baseUrl = "https://{0}.qualtrics.com/API/v3/surveys/{1}/export-responses/".format(
         datacenter, surveyid
     )
-    headers = {"content-type": "application/json", "x-api-token": token}
+    headers = {
+        "content-type": "application/json",
+        "x-api-token": token,
+    }
 
-    response = qualtrics_api_request("GET", baseUrl, headers).json()
-
-    # we check if the response is okay, and if it is not, we raise the RuntimeError
-    if re.search(pattern="^200\s", string=response["meta"]["httpStatus"]) is None:
-        raise RuntimeError(
-            f"API request failed: {response['meta']['httpStatus']}, {response['meta']['error']['errorMessage']}"
+    # Step 1: Creating Data Export
+    downloadRequestUrl = baseUrl
+    if lastpulldate == None:
+        downloadRequestPayload = (
+            '{"format":"' + fileformat + '", "timeZone":"America/Chicago"}'
         )
-    # TODO: check to make sure this works
+    else:
+        downloadRequestPayload = (
+            '{"format":"'
+            + fileformat
+            + '", "startDate":"'
+            + lastpulldate
+            + 'T00:00:00-06:00", "timeZone":"America/Chicago"}'
+        )
+    downloadRequestResponse = requests.request(
+        "POST", downloadRequestUrl, data=downloadRequestPayload, headers=headers
+    )
+    progressId = downloadRequestResponse.json()["result"]["progressId"]
+    # print(downloadRequestResponse.text)
 
-    return response
+    # Step 2: Checking on Data Export Progress and waiting until export is ready
+    while progressStatus != "complete" and progressStatus != "failed":
+        requestCheckUrl = baseUrl + progressId
+        requestCheckResponse = requests.request("GET", requestCheckUrl, headers=headers)
+        requestCheckProgress = requestCheckResponse.json()["result"]["percentComplete"]
+        progress(float(requestCheckProgress), 100.0, prefix="Progress\t\t")
+        progressStatus = requestCheckResponse.json()["result"]["status"]
+
+    # step 2.1: Check for error
+    if progressStatus == "failed":
+        raise Exception(
+            f"export failed, HTTP Status {requestCheckResponse.json()['meta']['httpStatus']}"
+        )
+
+    fileId = requestCheckResponse.json()["result"]["fileId"]
+
+    # Step 3: Downloading file
+    requestDownloadUrl = baseUrl + fileId + "/file"
+    requestDownload = requests.request(
+        "GET", requestDownloadUrl, headers=headers, stream=True
+    )
+
+    # Step 4: Extract file
+    # if (saveoutput == False) and ((fileformat == "csv") or (fileformat == "tsv")):
+    #     # print(io.BytesIO(requestDownload.content))
+    #     with zipfile.ZipFile(io.BytesIO(requestDownload.content)) as survey_zip:
+    #         for s in survey_zip.namelist():
+    #             print(s)
+    #             # print(survey_zip)
+    #             # save file in memory to dataframe.
+    #             # with survey_zip.open(s) as f:
+    #             # with survey_zip.read(s) as f:
+    #             # f = io.BytesIO(survey_zip.read(s))
+    #             f = io.BytesIO(requestDownload.content)
+    #             f.seek(0)
+    #             # # print(f)
+    #             df = pd.read_csv(f, sep=("\t" if fileformat == "tsv" else ","))
+    #     return df
+    # else:
+    # Unzipping the file
+    # zip_responses = zipfile.ZipFile(io.BytesIO(requestDownload.content))
+    # get file names from zip directory
+    zip_responses_files = zipfile.ZipFile(
+        io.BytesIO(requestDownload.content)
+    ).namelist()
+    # extract files
+    # zip_responses.extractall("MyQualtricsDownload")
+    zipfile.ZipFile(io.BytesIO(requestDownload.content)).extractall(outputdirectory)
+    # zip_responses.extractall(outputdirectory)
+
+    # rename files with date/timestamp
+    newname = ""
+    new_files = []
+    for file in zip_responses_files:
+        newname = (
+            ("" if fileprefix == None else fileprefix)
+            + os.path.splitext(os.path.basename(os.path.join(outputdirectory, file)))[0]
+            + f"_{time.strftime('%Y%m%d_T%H%M%S')}"
+            + "."
+            + fileformat
+        )
+        os.rename(
+            os.path.join(outputdirectory, file), os.path.join(outputdirectory, newname)
+        )
+        print(f"{newname} saved!")
+        new_files.append(newname)
+    # print('Complete')
+
+    # get the file and read the data
+    fileformatSep = "\t" if fileformat == "tsv" else ","
+    print(os.path.join(outputdirectory, newname))
+    df = pd.read_table(
+        os.path.join(outputdirectory, newname),
+        sep=fileformatSep,
+        header=0,
+        encoding="UTF-16",
+    )
+
+    if saveoutput == False or saveoutput is None:
+        os.remove(os.path.join(outputdirectory, newname))
+        return df
+    else:
+        # return new_files
+        return df
+
+
+def progress(progress_val, total, prefix=""):
+    # bar_len = os.get_terminal_size().columns/2.0
+    bar_len = 60
+    filled_len = int(round(bar_len * progress_val / float(total)))
+
+    percents = round(100.0 * progress_val / float(total), 1)
+    bar = "=" * filled_len + "-" * (bar_len - filled_len)
+
+    sys.stdout.write("%s [%s] %s%s\r" % (prefix, bar, percents, "%"))
+    sys.stdout.flush()
 
 
 def field_type_lookup(question):
@@ -649,10 +986,25 @@ def main():
     # path = args.path
     # source = args.source.__str__()
 
+    lastpulldate = args.lastpulldate if (args.lastpulldate != None) else None
+    # fileformat = args.fileformat if (args.fileformat != None) else "tsv" # we default to tsv
+
     if args.command != None:
         func = function_map[args.command]
         if args.command in ["survey_definition", "convert_survey"]:
             out = func(args.apitoken, args.datacenter, args.surveyid)
+        elif args.command in ["get_survey_responses"]:
+            # if args.savedata == False:
+            out = get_qualtrics_survey_responses(
+                args.apitoken,
+                args.datacenter,
+                args.surveyid,
+                fileformat=args.fileformat,
+                lastpulldate=args.lastpulldate,
+                outputdirectory=args.output_dir,
+                saveoutput=args.saveoutput,
+            )
+            # out = func(args.apitoken, args.datacenter, args.surveyid, fileFormat = fileformat, lastpulldate = lastpulldate, )
         elif args.command in [
             "get_survey_questions",
             "get_all_survey_questions",
@@ -675,7 +1027,15 @@ function_map = {
     "get_question_types": get_question_types,
     "get_question_tags": get_question_tags,
     "convert_survey": get_metadata_from_survey,
+    "get_survey_responses": get_qualtrics_survey_responses,
 }
+
+
+# helper function to check valid directory path
+def directory(directory):
+    if not os.path.isdir(directory):
+        os.makedirs(directory)
+    return directory
 
 
 def parse_args():
@@ -704,6 +1064,36 @@ def parse_args():
         type=str,
         dest="apitoken",
         help="Qualtrics API token",
+    )
+    parser.add_argument(
+        "--fileformat",
+        type=str,
+        choices=["csv", "tsv", "spss"],
+        default="tsv",
+        dest="fileformat",
+        help="File format for pulling qualtrics responses. This will default to 'tsv'.",
+    )
+    parser.add_argument(
+        "--lastpulldate",
+        type=str,
+        dest="lastpulldate",
+        default=None,
+        help="Last pull date for pulling qualtrics responses",
+    )
+    parser.add_argument(
+        "-o",
+        "--output_dir",
+        dest="output_dir",
+        default="MyQualtricsDownloads",
+        type=directory,
+        help="Valid file path to output directory.",
+    )
+    parser.add_argument(
+        "--saveoutput",
+        dest="saveoutput",
+        type=bool,
+        default=False,
+        help="True/False save data to file. File will be saved to --output_dir path specified, or default 'MyQualtricsDownloads/'",
     )
     return parser.parse_args()
 
