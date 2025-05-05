@@ -122,6 +122,20 @@ The `fields` key in the json instrument template will have a dictionary as its v
     * Will only come into play when field_type_sql is a form of string (varchar, text, mediumtext, etc.)
 * `page_php`: Indicates what page the field will be presented on in the front end
     * type: int
+* `rule_php`: Indicates a field's required status. Defaults to `false`, or can be a dictionary that defines the information about the field's required status with keys "rule", "required", "message" and "group"
+    * type: dict | false
+    * The LORIS Zookeeper code will analyze this field to determine if a response is partially complete or completely null
+        * Because `rule_php` defaults to `false`, it does not treat that as a 'not required field'. To indicate a 'not required field', define `rule_php` as `{"required": false}`
+        * An example of this can be found in the APSI instrument templates for fields q26 and its follow up questions
+    * The other possible keys in the value dictionary ("rule", "message" and "group") can be used to clarify field requirements. For example:
+        ```json 
+        "rule_php": {
+            "rule": "numeric",
+            "required": true,
+            "message": "This field must be a number.",
+            "group": "validation_group_1"
+        }
+        ```
 * `hidden_on_sql`: ‘True’ if the field isn’t in the backend, ‘false’ otherwise
     * type: boolean
     * Will almost always be ‘false’
